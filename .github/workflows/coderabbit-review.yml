@@ -8,10 +8,7 @@ jobs:
   coderabbit-review:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: CodeRabbit AI Review
-        uses: coderabbitai/coderabbit@v0.14.0
+      - uses: actions/checkout@v4
+      - uses: coderabbitai/coderabbit@v0.14.0
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
