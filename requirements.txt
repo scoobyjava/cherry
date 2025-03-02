@@ -1,7 +1,12 @@
 fastapi
-uvicorn
+uvicorn[standard]
+python-dotenv
 openai
-autogen
-pymilvus
-requests
+chromadb
+numpy
+networkx
 langchain
+langchain-openai
+langchain-community
+langchain-experimental
+pydantic

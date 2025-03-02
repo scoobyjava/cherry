@@ -1,0 +1,350 @@
+2025-02-27 16:58:12,036 - cherry_ai - INFO - Logger initialized with level INFO
+2025-02-27 16:58:12,040 - cherry_ai - INFO - Initialized in-memory storage
+2025-02-27 16:58:12,049 - cherry_ai - INFO - Bootstrapping Cherry AI...
+2025-02-27 16:58:12,050 - cherry_ai - INFO - Initializing orchestrator...
+2025-02-27 16:58:12,104 - cherry_ai - INFO - OpenAI client initialized
+2025-02-27 16:58:12,105 - cherry_ai - INFO - Initialized orchestrator with 4 agents: Research Agent, Creative Agent, Code Agent, Analytics Agent
+2025-02-27 16:58:12,105 - cherry_ai - INFO - Orchestrator started
+2025-02-27 16:58:12,105 - cherry_ai - INFO - Orchestrator initialized and started successfully
+2025-02-27 16:58:12,108 - cherry_ai - INFO - API routes initialized
+2025-02-27 16:58:12,109 - cherry_ai - INFO - Cherry AI bootstrap complete
+2025-02-27 16:58:12,109 - cherry_ai - INFO - Cherry AI v0.1.0 starting up
+2025-02-27 16:58:12,109 - cherry_ai - INFO - API Keys available: OpenAI, Elevenlabs, Gemini, Grok
+2025-02-27 16:58:12,109 - cherry_ai - INFO - Starting server on port 8000
+2025-02-27 17:00:38,443 - cherry_ai - INFO - Added task: Research the latest advancements in AI orchestration (ID: 1740675638443, Priority: 1)
+2025-02-27 17:00:38,469 - cherry_ai - INFO - Processing task: Research the latest advancements in AI orchestration
+2025-02-27 17:00:43,172 - cherry_ai - INFO - Assigned Research Agent to task 1740675638443
+2025-02-27 17:00:43,173 - cherry_ai - INFO - Processing task 1740675638443 with Research Agent
+2025-02-27 17:00:43,173 - cherry_ai - INFO - Task completed: 1740675638443
+2025-02-27 17:01:47,162 - cherry_ai - INFO - Added task: What are the benefits of agent-based AI systems? (ID: 1740675707162, Priority: 1)
+2025-02-27 17:01:47,162 - cherry_ai - ERROR - LLM processing error: 'dict' object has no attribute 'id'
+2025-02-27 17:01:47,163 - cherry_ai - INFO - Attempting with fallback model gpt-3.5-turbo
+2025-02-27 17:01:47,163 - cherry_ai - ERROR - Fallback model processing error: 'dict' object has no attribute 'description'
+2025-02-27 17:01:47,233 - cherry_ai - INFO - Processing task: What are the benefits of agent-based AI systems?
+2025-02-27 17:01:49,903 - cherry_ai - INFO - No specific agent matched for task 1740675707162, using default processing
+2025-02-27 17:01:49,903 - cherry_ai - INFO - Using default LLM processing for task 1740675707162
+2025-02-27 17:01:49,903 - cherry_ai - INFO - Processing task 1740675707162 with LLM model gpt-4o
+2025-02-27 17:02:01,433 - cherry_ai - INFO - Task completed: 1740675707162
+2025-02-27 17:03:00,845 - cherry_ai - INFO - Application shutting down...
+2025-02-27 17:03:00,845 - cherry_ai - INFO - Orchestrator stopping...
+2025-02-27 17:03:00,892 - cherry_ai - INFO - Orchestrator stopped
+2025-02-27 18:20:55,899 - cherry_ai - INFO - Logger initialized with level INFO
+2025-02-27 18:20:55,901 - cherry_ai - INFO - Initialized in-memory storage
+2025-02-27 18:20:55,912 - cherry_ai - INFO - Bootstrapping Cherry AI...
+2025-02-27 18:20:55,915 - cherry_ai - INFO - Initializing orchestrator...
+2025-02-27 18:20:55,915 - cherry_ai - INFO - OpenAI client initialized with provided API key.
+2025-02-27 18:20:55,918 - cherry_ai - INFO - Initialized orchestrator with 4 agents: Research Agent, Creative Agent, Code Agent, Analytics Agent
+2025-02-27 18:20:55,920 - cherry_ai - ERROR - Failed to initialize orchestrator: 'Orchestrator' object has no attribute 'run'
+2025-02-27 18:50:56,049 - cherry_ai - INFO - Logger initialized with level INFO
+2025-02-27 18:57:12,441 - cherry_ai - INFO - Logger initialized with level INFO
+2025-02-27 18:57:25,792 - cherry_ai - INFO - Logger initialized with level INFO
+2025-02-27 19:01:04,560 - cherry_ai - INFO - Logger initialized with level INFO
+2025-02-27 19:01:04,979 - cherry_ai - INFO - Initialized in-memory storage
+2025-02-27 19:01:04,989 - cherry_ai - INFO - Bootstrapping Cherry AI...
+2025-02-27 19:01:04,990 - cherry_ai - INFO - Initializing orchestrator...
+2025-02-27 19:01:14,998 - cherry_ai - ERROR - Failed to initialize orchestrator: <MilvusException: (code=2, message=Fail connecting to server on localhost:19530, illegal connection params or server unavailable)>
+2025-02-27 19:17:29,088 - cherry_ai - INFO - Logger initialized with level INFO
+2025-02-27 19:17:29,531 - cherry_ai - INFO - Initialized in-memory storage
+2025-02-27 19:17:29,545 - cherry_ai - INFO - Bootstrapping Cherry AI...
+2025-02-27 19:17:29,546 - cherry_ai - INFO - Initializing orchestrator...
+2025-02-27 19:17:29,546 - cherry_ai - INFO - Initialized with 4 agents: Research Agent, Creative Agent, Code Agent, Analytics Agent
+2025-02-27 19:17:30,071 - cherry_ai - INFO - Initialized ChromaDB with persistence at ./chroma_db
+2025-02-27 19:17:30,093 - cherry_ai - INFO - Using collection: cherry_memory
+2025-02-27 19:17:30,094 - cherry_ai - INFO - Memory system initialized with ChromaDB
+2025-02-27 19:17:30,144 - cherry_ai - INFO - OpenAI client initialized
+2025-02-27 19:17:30,145 - cherry_ai - INFO - Orchestrator started
+2025-02-27 19:17:30,145 - cherry_ai - INFO - Orchestrator initialized and started successfully
+2025-02-27 19:17:30,148 - cherry_ai - INFO - API routes initialized
+2025-02-27 19:17:30,148 - cherry_ai - INFO - Cherry AI bootstrap complete
+2025-02-27 19:17:30,149 - cherry_ai - INFO - Cherry AI v0.1.0 starting up
+2025-02-27 19:17:30,149 - cherry_ai - INFO - API Keys available: OpenAI, Elevenlabs, Gemini, Grok
+2025-02-27 19:17:30,149 - cherry_ai - INFO - Starting server on port 8000
+2025-02-27 19:17:51,378 - cherry_ai - INFO - Processing task: Research the latest advancements in AI orchestration
+2025-02-27 19:17:51,970 - cherry_ai - INFO - Assigned Research Agent to task 1740683871377
+2025-02-27 19:17:51,971 - cherry_ai - INFO - Processing task 1740683871377 with Research Agent
+2025-02-27 19:17:51,971 - cherry_ai - INFO - Task completed: 1740683871377
+2025-02-27 19:17:52,328 - cherry_ai - INFO - Task 1740683871377 stored in memory with doc_id doc_1740683872310
+2025-02-27 19:17:52,328 - cherry_ai - INFO - Added task: Research the latest advancements in AI orchestration (ID: 1740683871377, Priority: 1)
+2025-02-27 19:18:14,194 - cherry_ai - INFO - Processing task: What are the recent developments in AI orchestration frameworks?
+2025-02-27 19:18:14,818 - cherry_ai - INFO - Found 1 similar tasks for context
+2025-02-27 19:18:14,818 - cherry_ai - INFO - Assigned Code Agent to task 1740683894188
+2025-02-27 19:18:14,818 - cherry_ai - INFO - Processing task 1740683894188 with Code Agent
+2025-02-27 19:18:14,818 - cherry_ai - INFO - Task completed: 1740683894188
+2025-02-27 19:18:14,983 - cherry_ai - INFO - Task 1740683894188 stored in memory with doc_id doc_1740683894974
+2025-02-27 19:18:14,983 - cherry_ai - INFO - Added task: What are the recent developments in AI orchestration frameworks? (ID: 1740683894188, Priority: 1)
+2025-02-27 20:05:46,681 - cherry_ai - INFO - Logger initialized with level INFO
+2025-02-27 20:09:46,330 - cherry_ai - INFO - Application shutting down...
+2025-02-27 20:09:46,330 - cherry_ai - INFO - Orchestrator stopping...
+2025-02-27 20:09:46,373 - cherry_ai - INFO - Orchestrator stopped
+2025-02-27 20:10:10,503 - cherry_ai - INFO - Logger initialized with level INFO
+2025-02-28 00:17:19,528 - cherry_ai - INFO - Logger initialized with level INFO
+2025-02-28 17:09:03,281 - cherry_ai - INFO - Logger initialized with level INFO
+2025-02-28 17:18:25,285 - cherry_ai - INFO - Logger initialized with level INFO
+2025-02-28 17:21:45,607 - cherry_ai - INFO - Logger initialized with level INFO
+2025-02-28 17:25:42,180 - cherry_ai - INFO - Logger initialized with level INFO
+2025-02-28 17:26:04,901 - cherry_ai - INFO - Logger initialized with level INFO
+2025-02-28 17:27:55,085 - cherry_ai - INFO - Logger initialized with level INFO
+2025-02-28 17:27:55,568 - cherry_ai - INFO - Initialized in-memory storage
+2025-02-28 17:29:24,504 - cherry_ai - INFO - Logger initialized with level INFO
+2025-02-28 17:29:25,577 - cherry_ai - INFO - Initialized in-memory storage
+2025-02-28 17:31:20,872 - cherry_ai - INFO - Logger initialized with level INFO
+2025-02-28 17:31:21,854 - cherry_ai - INFO - Initialized in-memory storage
+2025-02-28 17:34:00,251 - cherry_ai - INFO - Logger initialized with level INFO
+2025-02-28 17:34:01,223 - cherry_ai - INFO - Initialized in-memory storage
+2025-02-28 17:34:01,234 - cherry_ai - INFO - Bootstrapping Cherry AI...
+2025-02-28 17:34:01,234 - cherry_ai - INFO - Initializing orchestrator...
+2025-02-28 17:34:01,846 - cherry_ai - INFO - Initialized ChromaDB with persistence at ./chroma_db
+2025-02-28 17:34:02,160 - cherry_ai - INFO - Using collection: cherry_primary_memory
+2025-02-28 17:34:02,160 - cherry_ai - INFO - Memory initialized successfully.
+2025-02-28 17:34:02,161 - cherry_ai - INFO - AdvancedOrchestrator running...
+2025-02-28 17:34:02,161 - cherry_ai - INFO - AdvancedOrchestrator initialized and started successfully
+2025-02-28 17:34:02,166 - cherry_ai - INFO - API routes initialized
+2025-02-28 17:34:02,167 - cherry_ai - INFO - Cherry AI bootstrap complete
+2025-02-28 17:34:02,167 - cherry_ai - INFO - Cherry AI v0.1.0 starting up
+2025-02-28 17:34:02,167 - cherry_ai - INFO - API Keys available: OpenAI, Elevenlabs, Gemini, Grok
+2025-02-28 17:34:02,168 - cherry_ai - INFO - Starting server on port 8000
+2025-02-28 17:43:59,579 - cherry_ai - INFO - Logger initialized with level INFO
+2025-02-28 17:44:00,648 - cherry_ai - INFO - Initialized in-memory storage
+2025-02-28 17:44:00,665 - cherry_ai - INFO - Bootstrapping Cherry AI...
+2025-02-28 17:44:00,666 - cherry_ai - INFO - Initializing orchestrator...
+2025-02-28 17:44:01,460 - cherry_ai - INFO - Initialized ChromaDB with persistence at ./chroma_db
+2025-02-28 17:44:01,464 - cherry_ai - INFO - Using collection: cherry_primary_memory
+2025-02-28 17:44:01,465 - cherry_ai - INFO - Memory initialized successfully.
+2025-02-28 17:44:01,466 - cherry_ai - INFO - AdvancedOrchestrator running...
+2025-02-28 17:44:01,466 - cherry_ai - INFO - AdvancedOrchestrator initialized and started successfully
+2025-02-28 17:44:01,473 - cherry_ai - INFO - API routes initialized
+2025-02-28 17:44:01,473 - cherry_ai - INFO - Cherry AI bootstrap complete
+2025-02-28 17:44:01,473 - cherry_ai - INFO - Cherry AI v0.1.0 starting up
+2025-02-28 17:44:01,474 - cherry_ai - INFO - API Keys available: OpenAI, Elevenlabs, Gemini, Grok
+2025-02-28 17:44:01,474 - cherry_ai - INFO - Starting server on port 8000
+2025-02-28 17:44:01,570 - cherry_ai - INFO - Application shutting down...
+2025-02-28 17:44:01,571 - cherry_ai - INFO - AdvancedOrchestrator stopped.
+2025-02-28 17:44:01,571 - cherry_ai - INFO - AdvancedOrchestrator stopped
+2025-02-28 17:45:03,388 - cherry_ai - INFO - Logger initialized with level INFO
+2025-02-28 19:18:34 | Cherry AI | INFO | logger.py:63 | ✅ Logger initialized successfully with level 'INFO'
+2025-02-28 19:18:35 | Cherry AI | INFO | memory.py:50 | Initialized in-memory storage
+2025-02-28 19:18:35 | Cherry AI | INFO | bootstrap.py:56 | 🔄 Bootstrapping Cherry AI...
+2025-02-28 19:18:35 | Cherry AI | INFO | bootstrap.py:33 | 🚧 Initializing Advanced Orchestrator...
+2025-02-28 19:18:35 | Cherry AI | INFO | memory_chroma.py:32 | 🍒 ChromaMemory initialized with collection 'cherry_primary_memory' at './chroma_db'
+2025-02-28 19:18:35 | Cherry AI | INFO | orchestrator.py:57 | Memory initialized successfully.
+2025-02-28 19:18:35 | Cherry AI | INFO | orchestrator.py:63 | AdvancedOrchestrator running...
+2025-02-28 19:18:35 | Cherry AI | INFO | bootstrap.py:47 | ✅ Advanced Orchestrator started successfully!
+2025-02-28 19:18:35 | Cherry AI | INFO | api.py:108 | API routes initialized
+2025-02-28 19:18:35 | Cherry AI | INFO | bootstrap.py:76 | 🎉 Cherry AI bootstrap completed successfully!
+2025-02-28 19:18:35 | Cherry AI | INFO | main.py:13 | 🍒 Cherry AI v0.1.0 starting up...
+2025-02-28 19:18:35 | Cherry AI | INFO | config.py:118 | 🚀 Cherry AI Configuration Summary:
+2025-02-28 19:18:35 | Cherry AI | INFO | config.py:119 |   - Debug mode: ON
+2025-02-28 19:18:35 | Cherry AI | INFO | config.py:120 |   - Server: 0.0.0.0:8000
+2025-02-28 19:18:35 | Cherry AI | INFO | config.py:121 |   - Enabled Agents: Research Agent, Creative Agent, Code Agent, Analytics Agent
+2025-02-28 19:18:35 | Cherry AI | INFO | config.py:123 |   - Loaded API keys: OpenAI, Airtable, ElevenLabs, Gemini, Grok, Railway, Venice
+2025-02-28 19:18:35 | Cherry AI | INFO | config.py:124 |   - VectorDB Directory: ./chroma_db
+2025-02-28 19:18:35 | Cherry AI | INFO | config.py:125 |   - DB Type: memory
+2025-02-28 19:18:35 | Cherry AI | INFO | config.py:126 |   - LangChain Tracing: Disabled
+2025-02-28 19:18:35 | Cherry AI | INFO | main.py:21 | 🚀 Server launching on http://0.0.0.0:8000
+2025-02-28 19:24:47 | Cherry AI | INFO | logger.py:63 | ✅ Logger initialized successfully with level 'INFO'
+2025-02-28 19:24:48 | Cherry AI | INFO | memory.py:50 | Initialized in-memory storage
+2025-02-28 19:24:48 | Cherry AI | INFO | bootstrap.py:56 | 🔄 Bootstrapping Cherry AI...
+2025-02-28 19:24:48 | Cherry AI | INFO | bootstrap.py:33 | 🚧 Initializing Advanced Orchestrator...
+2025-02-28 19:24:48 | Cherry AI | INFO | memory_chroma.py:32 | 🍒 ChromaMemory initialized with collection 'cherry_primary_memory' at './chroma_db'
+2025-02-28 19:24:48 | Cherry AI | INFO | orchestrator.py:57 | Memory initialized successfully.
+2025-02-28 19:24:48 | Cherry AI | INFO | orchestrator.py:63 | AdvancedOrchestrator running...
+2025-02-28 19:24:48 | Cherry AI | INFO | bootstrap.py:47 | ✅ Advanced Orchestrator started successfully!
+2025-02-28 19:24:48 | Cherry AI | INFO | api.py:108 | API routes initialized
+2025-02-28 19:24:48 | Cherry AI | INFO | bootstrap.py:76 | 🎉 Cherry AI bootstrap completed successfully!
+2025-02-28 19:24:48 | Cherry AI | INFO | main.py:13 | 🍒 Cherry AI v0.1.0 starting up...
+2025-02-28 19:24:48 | Cherry AI | INFO | config.py:118 | 🚀 Cherry AI Configuration Summary:
+2025-02-28 19:24:48 | Cherry AI | INFO | config.py:119 |   - Debug mode: ON
+2025-02-28 19:24:48 | Cherry AI | INFO | config.py:120 |   - Server: 0.0.0.0:8000
+2025-02-28 19:24:48 | Cherry AI | INFO | config.py:121 |   - Enabled Agents: Research Agent, Creative Agent, Code Agent, Analytics Agent
+2025-02-28 19:24:48 | Cherry AI | INFO | config.py:123 |   - Loaded API keys: OpenAI, Airtable, ElevenLabs, Gemini, Grok, Railway, Venice
+2025-02-28 19:24:48 | Cherry AI | INFO | config.py:124 |   - VectorDB Directory: ./chroma_db
+2025-02-28 19:24:48 | Cherry AI | INFO | config.py:125 |   - DB Type: memory
+2025-02-28 19:24:48 | Cherry AI | INFO | config.py:126 |   - LangChain Tracing: Disabled
+2025-02-28 19:24:48 | Cherry AI | INFO | main.py:21 | 🚀 Server launching on http://0.0.0.0:8000
+2025-02-28 19:28:43 | Cherry AI | INFO | logger.py:63 | ✅ Logger initialized successfully with level 'INFO'
+2025-02-28 19:28:43 | Cherry AI | INFO | memory.py:50 | Initialized in-memory storage
+2025-02-28 19:31:31 | Cherry AI | INFO | logger.py:63 | ✅ Logger initialized successfully with level 'INFO'
+2025-02-28 19:31:31 | Cherry AI | INFO | memory.py:50 | Initialized in-memory storage
+2025-02-28 19:31:31 | Cherry AI | INFO | bootstrap.py:56 | 🔄 Bootstrapping Cherry AI...
+2025-02-28 19:31:31 | Cherry AI | INFO | bootstrap.py:33 | 🚧 Initializing Advanced Orchestrator...
+2025-02-28 19:31:32 | Cherry AI | INFO | memory_chroma.py:32 | 🍒 ChromaMemory initialized with collection 'cherry_primary_memory' at './chroma_db'
+2025-02-28 19:31:32 | Cherry AI | INFO | orchestrator.py:57 | Memory initialized successfully.
+2025-02-28 19:31:32 | Cherry AI | INFO | orchestrator.py:63 | AdvancedOrchestrator running...
+2025-02-28 19:31:32 | Cherry AI | INFO | bootstrap.py:47 | ✅ Advanced Orchestrator started successfully!
+2025-02-28 19:31:32 | Cherry AI | INFO | api.py:108 | API routes initialized
+2025-02-28 19:31:32 | Cherry AI | INFO | bootstrap.py:76 | 🎉 Cherry AI bootstrap completed successfully!
+2025-02-28 19:31:42 | Cherry AI | INFO | bootstrap.py:70 | 🛑 Shutting down Cherry AI...
+2025-02-28 19:31:42 | Cherry AI | INFO | orchestrator.py:67 | AdvancedOrchestrator stopped.
+2025-02-28 19:31:42 | Cherry AI | INFO | bootstrap.py:74 | 🔻 Advanced Orchestrator stopped gracefully.
+2025-02-28 19:31:47 | Cherry AI | INFO | logger.py:63 | ✅ Logger initialized successfully with level 'INFO'
+2025-02-28 19:31:47 | Cherry AI | INFO | memory.py:50 | Initialized in-memory storage
+2025-02-28 19:31:47 | Cherry AI | INFO | bootstrap.py:56 | 🔄 Bootstrapping Cherry AI...
+2025-02-28 19:31:47 | Cherry AI | INFO | bootstrap.py:33 | 🚧 Initializing Advanced Orchestrator...
+2025-02-28 19:31:48 | Cherry AI | INFO | memory_chroma.py:32 | 🍒 ChromaMemory initialized with collection 'cherry_primary_memory' at './chroma_db'
+2025-02-28 19:31:48 | Cherry AI | INFO | orchestrator.py:57 | Memory initialized successfully.
+2025-02-28 19:31:48 | Cherry AI | INFO | orchestrator.py:63 | AdvancedOrchestrator running...
+2025-02-28 19:31:48 | Cherry AI | INFO | bootstrap.py:47 | ✅ Advanced Orchestrator started successfully!
+2025-02-28 19:31:48 | Cherry AI | INFO | api.py:108 | API routes initialized
+2025-02-28 19:31:48 | Cherry AI | INFO | bootstrap.py:76 | 🎉 Cherry AI bootstrap completed successfully!
+2025-03-01 19:15:23 | Cherry AI | INFO | logger.py:52 | ✅ Logger initialized successfully with level 'INFO'
+2025-03-01 19:15:24 | Cherry AI | INFO | memory.py:50 | Initialized in-memory storage
+2025-03-01 19:15:24 | Cherry AI | INFO | bootstrap.py:56 | 🔄 Bootstrapping Cherry AI...
+2025-03-01 19:15:24 | Cherry AI | INFO | bootstrap.py:33 | 🚧 Initializing Advanced Orchestrator...
+2025-03-01 19:15:24 | Cherry AI | INFO | memory_chroma.py:23 | 🍒 ChromaMemory initialized with collection 'cherry_primary_memory' at './chroma_db'
+2025-03-01 19:15:24 | Cherry AI | INFO | orchestrator.py:57 | Memory initialized successfully.
+2025-03-01 19:15:24 | Cherry AI | INFO | orchestrator.py:63 | AdvancedOrchestrator running...
+2025-03-01 19:15:24 | Cherry AI | INFO | bootstrap.py:47 | ✅ Advanced Orchestrator started successfully!
+2025-03-01 19:15:24 | Cherry AI | INFO | api.py:68 | ✅ API routes initialized successfully
+2025-03-01 19:15:24 | Cherry AI | INFO | bootstrap.py:76 | 🎉 Cherry AI bootstrap completed successfully!
+2025-03-01 19:15:26 | Cherry AI | INFO | logger.py:52 | ✅ Logger initialized successfully with level 'INFO'
+2025-03-01 19:15:27 | Cherry AI | INFO | memory.py:50 | Initialized in-memory storage
+2025-03-01 19:15:27 | Cherry AI | INFO | bootstrap.py:56 | 🔄 Bootstrapping Cherry AI...
+2025-03-01 19:15:27 | Cherry AI | INFO | bootstrap.py:33 | 🚧 Initializing Advanced Orchestrator...
+2025-03-01 19:15:27 | Cherry AI | INFO | memory_chroma.py:23 | 🍒 ChromaMemory initialized with collection 'cherry_primary_memory' at './chroma_db'
+2025-03-01 19:15:27 | Cherry AI | INFO | orchestrator.py:57 | Memory initialized successfully.
+2025-03-01 19:15:27 | Cherry AI | INFO | orchestrator.py:63 | AdvancedOrchestrator running...
+2025-03-01 19:15:27 | Cherry AI | INFO | bootstrap.py:47 | ✅ Advanced Orchestrator started successfully!
+2025-03-01 19:15:27 | Cherry AI | INFO | api.py:68 | ✅ API routes initialized successfully
+2025-03-01 19:15:27 | Cherry AI | INFO | bootstrap.py:76 | 🎉 Cherry AI bootstrap completed successfully!
+2025-03-01 19:15:41 | Cherry AI | INFO | bootstrap.py:70 | 🛑 Shutting down Cherry AI...
+2025-03-01 19:15:41 | Cherry AI | INFO | orchestrator.py:67 | AdvancedOrchestrator stopped.
+2025-03-01 19:15:41 | Cherry AI | INFO | bootstrap.py:74 | 🔻 Advanced Orchestrator stopped gracefully.
+2025-03-01 19:15:45 | Cherry AI | INFO | logger.py:52 | ✅ Logger initialized successfully with level 'INFO'
+2025-03-01 19:15:45 | Cherry AI | INFO | memory.py:50 | Initialized in-memory storage
+2025-03-01 19:15:45 | Cherry AI | INFO | bootstrap.py:56 | 🔄 Bootstrapping Cherry AI...
+2025-03-01 19:15:45 | Cherry AI | INFO | bootstrap.py:33 | 🚧 Initializing Advanced Orchestrator...
+2025-03-01 19:15:46 | Cherry AI | INFO | memory_chroma.py:23 | 🍒 ChromaMemory initialized with collection 'cherry_primary_memory' at './chroma_db'
+2025-03-01 19:15:46 | Cherry AI | INFO | orchestrator.py:57 | Memory initialized successfully.
+2025-03-01 19:15:46 | Cherry AI | INFO | orchestrator.py:63 | AdvancedOrchestrator running...
+2025-03-01 19:15:46 | Cherry AI | INFO | bootstrap.py:47 | ✅ Advanced Orchestrator started successfully!
+2025-03-01 19:15:46 | Cherry AI | INFO | api.py:68 | ✅ API routes initialized successfully
+2025-03-01 19:15:46 | Cherry AI | INFO | bootstrap.py:76 | 🎉 Cherry AI bootstrap completed successfully!
+2025-03-01 19:30:22 | Cherry AI | INFO | bootstrap.py:70 | 🛑 Shutting down Cherry AI...
+2025-03-01 19:30:22 | Cherry AI | INFO | orchestrator.py:67 | AdvancedOrchestrator stopped.
+2025-03-01 19:30:22 | Cherry AI | INFO | bootstrap.py:74 | 🔻 Advanced Orchestrator stopped gracefully.
+2025-03-01 19:30:32 | Cherry AI | INFO | logger.py:52 | ✅ Logger initialized successfully with level 'INFO'
+2025-03-01 19:30:33 | Cherry AI | INFO | memory.py:50 | Initialized in-memory storage
+2025-03-01 19:30:33 | Cherry AI | INFO | bootstrap.py:56 | 🔄 Bootstrapping Cherry AI...
+2025-03-01 19:30:33 | Cherry AI | INFO | bootstrap.py:33 | 🚧 Initializing Advanced Orchestrator...
+2025-03-01 19:30:33 | Cherry AI | INFO | memory_chroma.py:23 | 🍒 ChromaMemory initialized with collection 'cherry_primary_memory' at './chroma_db'
+2025-03-01 19:30:33 | Cherry AI | INFO | orchestrator.py:57 | Memory initialized successfully.
+2025-03-01 19:30:33 | Cherry AI | INFO | orchestrator.py:63 | AdvancedOrchestrator running...
+2025-03-01 19:30:33 | Cherry AI | INFO | bootstrap.py:47 | ✅ Advanced Orchestrator started successfully!
+2025-03-01 19:30:33 | Cherry AI | INFO | api.py:68 | ✅ API routes initialized successfully
+2025-03-01 19:30:33 | Cherry AI | INFO | bootstrap.py:76 | 🎉 Cherry AI bootstrap completed successfully!
+2025-03-01 19:39:01 | Cherry AI | INFO | bootstrap.py:70 | 🛑 Shutting down Cherry AI...
+2025-03-01 19:39:01 | Cherry AI | INFO | orchestrator.py:67 | AdvancedOrchestrator stopped.
+2025-03-01 19:39:01 | Cherry AI | INFO | bootstrap.py:74 | 🔻 Advanced Orchestrator stopped gracefully.
+2025-03-01 19:39:03 | Cherry AI | INFO | logger.py:52 | ✅ Logger initialized successfully with level 'INFO'
+2025-03-01 19:39:15 | Cherry AI | INFO | logger.py:52 | ✅ Logger initialized successfully with level 'INFO'
+2025-03-01 19:39:17 | Cherry AI | INFO | logger.py:52 | ✅ Logger initialized successfully with level 'INFO'
+2025-03-01 19:40:11 | Cherry AI | INFO | logger.py:52 | ✅ Logger initialized successfully with level 'INFO'
+2025-03-01 19:43:34 | Cherry AI | INFO | logger.py:52 | ✅ Logger initialized successfully with level 'INFO'
+2025-03-01 19:43:34 | Cherry AI | INFO | memory.py:50 | Initialized in-memory storage
+2025-03-01 19:43:34 | Cherry AI | INFO | bootstrap.py:56 | 🔄 Bootstrapping Cherry AI...
+2025-03-01 19:43:34 | Cherry AI | INFO | bootstrap.py:33 | 🚧 Initializing Advanced Orchestrator...
+2025-03-01 19:43:34 | Cherry AI | INFO | memory_chroma.py:23 | 🍒 ChromaMemory initialized with collection 'cherry_primary_memory' at './chroma_db'
+2025-03-01 19:43:34 | Cherry AI | INFO | orchestrator.py:57 | Memory initialized successfully.
+2025-03-01 19:43:34 | Cherry AI | INFO | orchestrator.py:63 | AdvancedOrchestrator running...
+2025-03-01 19:43:34 | Cherry AI | INFO | bootstrap.py:47 | ✅ Advanced Orchestrator started successfully!
+2025-03-01 19:43:34 | Cherry AI | INFO | api.py:74 | API routes initialized successfully 🚀
+2025-03-01 19:43:34 | Cherry AI | INFO | bootstrap.py:76 | 🎉 Cherry AI bootstrap completed successfully!
+2025-03-01 19:50:21 | Cherry AI | INFO | bootstrap.py:70 | 🛑 Shutting down Cherry AI...
+2025-03-01 19:50:21 | Cherry AI | INFO | orchestrator.py:67 | AdvancedOrchestrator stopped.
+2025-03-01 19:50:21 | Cherry AI | INFO | bootstrap.py:74 | 🔻 Advanced Orchestrator stopped gracefully.
+2025-03-01 19:50:24 | Cherry AI | INFO | logger.py:52 | ✅ Logger initialized successfully with level 'INFO'
+2025-03-01 19:50:25 | Cherry AI | INFO | memory.py:50 | Initialized in-memory storage
+2025-03-01 19:50:25 | Cherry AI | INFO | bootstrap.py:56 | 🔄 Bootstrapping Cherry AI...
+2025-03-01 19:50:25 | Cherry AI | INFO | bootstrap.py:33 | 🚧 Initializing Advanced Orchestrator...
+2025-03-01 19:50:26 | Cherry AI | INFO | memory_chroma.py:23 | 🍒 ChromaMemory initialized with collection 'cherry_primary_memory' at './chroma_db'
+2025-03-01 19:50:26 | Cherry AI | INFO | orchestrator.py:57 | Memory initialized successfully.
+2025-03-01 19:50:26 | Cherry AI | INFO | orchestrator.py:63 | AdvancedOrchestrator running...
+2025-03-01 19:50:26 | Cherry AI | INFO | bootstrap.py:47 | ✅ Advanced Orchestrator started successfully!
+2025-03-01 19:50:26 | Cherry AI | INFO | api.py:126 | API routes initialized
+2025-03-01 19:50:26 | Cherry AI | INFO | bootstrap.py:76 | 🎉 Cherry AI bootstrap completed successfully!
+2025-03-01 19:50:27 | Cherry AI | INFO | logger.py:52 | ✅ Logger initialized successfully with level 'INFO'
+2025-03-01 19:50:28 | Cherry AI | INFO | memory.py:50 | Initialized in-memory storage
+2025-03-01 19:50:28 | Cherry AI | INFO | bootstrap.py:56 | 🔄 Bootstrapping Cherry AI...
+2025-03-01 19:50:28 | Cherry AI | INFO | bootstrap.py:33 | 🚧 Initializing Advanced Orchestrator...
+2025-03-01 19:50:29 | Cherry AI | INFO | memory_chroma.py:23 | 🍒 ChromaMemory initialized with collection 'cherry_primary_memory' at './chroma_db'
+2025-03-01 19:50:29 | Cherry AI | INFO | orchestrator.py:57 | Memory initialized successfully.
+2025-03-01 19:50:29 | Cherry AI | INFO | orchestrator.py:63 | AdvancedOrchestrator running...
+2025-03-01 19:50:29 | Cherry AI | INFO | bootstrap.py:47 | ✅ Advanced Orchestrator started successfully!
+2025-03-01 19:50:29 | Cherry AI | INFO | api.py:126 | API routes initialized
+2025-03-01 19:50:29 | Cherry AI | INFO | bootstrap.py:76 | 🎉 Cherry AI bootstrap completed successfully!
+2025-03-01 19:50:42 | Cherry AI | INFO | bootstrap.py:70 | 🛑 Shutting down Cherry AI...
+2025-03-01 19:50:42 | Cherry AI | INFO | orchestrator.py:67 | AdvancedOrchestrator stopped.
+2025-03-01 19:50:42 | Cherry AI | INFO | bootstrap.py:74 | 🔻 Advanced Orchestrator stopped gracefully.
+2025-03-01 19:50:46 | Cherry AI | INFO | logger.py:52 | ✅ Logger initialized successfully with level 'INFO'
+2025-03-01 19:50:46 | Cherry AI | INFO | memory.py:50 | Initialized in-memory storage
+2025-03-01 19:50:46 | Cherry AI | INFO | bootstrap.py:56 | 🔄 Bootstrapping Cherry AI...
+2025-03-01 19:50:46 | Cherry AI | INFO | bootstrap.py:33 | 🚧 Initializing Advanced Orchestrator...
+2025-03-01 19:50:47 | Cherry AI | INFO | memory_chroma.py:23 | 🍒 ChromaMemory initialized with collection 'cherry_primary_memory' at './chroma_db'
+2025-03-01 19:50:47 | Cherry AI | INFO | orchestrator.py:57 | Memory initialized successfully.
+2025-03-01 19:50:47 | Cherry AI | INFO | orchestrator.py:63 | AdvancedOrchestrator running...
+2025-03-01 19:50:47 | Cherry AI | INFO | bootstrap.py:47 | ✅ Advanced Orchestrator started successfully!
+2025-03-01 19:50:47 | Cherry AI | INFO | api.py:126 | API routes initialized
+2025-03-01 19:50:47 | Cherry AI | INFO | bootstrap.py:76 | 🎉 Cherry AI bootstrap completed successfully!
+2025-03-01 19:56:09 | Cherry AI | INFO | bootstrap.py:70 | 🛑 Shutting down Cherry AI...
+2025-03-01 19:56:09 | Cherry AI | INFO | orchestrator.py:67 | AdvancedOrchestrator stopped.
+2025-03-01 19:56:09 | Cherry AI | INFO | bootstrap.py:74 | 🔻 Advanced Orchestrator stopped gracefully.
+2025-03-01 19:56:10 | Cherry AI | INFO | logger.py:52 | ✅ Logger initialized successfully with level 'INFO'
+2025-03-01 19:56:11 | Cherry AI | INFO | memory.py:50 | Initialized in-memory storage
+2025-03-01 19:56:11 | Cherry AI | INFO | bootstrap.py:56 | 🔄 Bootstrapping Cherry AI...
+2025-03-01 19:56:11 | Cherry AI | INFO | bootstrap.py:33 | 🚧 Initializing Advanced Orchestrator...
+2025-03-01 19:56:11 | Cherry AI | INFO | memory_chroma.py:23 | 🍒 ChromaMemory initialized with collection 'cherry_primary_memory' at './chroma_db'
+2025-03-01 19:56:11 | Cherry AI | INFO | orchestrator.py:57 | Memory initialized successfully.
+2025-03-01 19:56:11 | Cherry AI | INFO | orchestrator.py:63 | AdvancedOrchestrator running...
+2025-03-01 19:56:11 | Cherry AI | INFO | bootstrap.py:47 | ✅ Advanced Orchestrator started successfully!
+2025-03-01 19:56:11 | Cherry AI | INFO | bootstrap.py:76 | 🎉 Cherry AI bootstrap completed successfully!
+2025-03-01 19:56:33 | Cherry AI | INFO | bootstrap.py:70 | 🛑 Shutting down Cherry AI...
+2025-03-01 19:56:33 | Cherry AI | INFO | orchestrator.py:67 | AdvancedOrchestrator stopped.
+2025-03-01 19:56:33 | Cherry AI | INFO | bootstrap.py:74 | 🔻 Advanced Orchestrator stopped gracefully.
+2025-03-01 19:56:34 | Cherry AI | INFO | logger.py:52 | ✅ Logger initialized successfully with level 'INFO'
+2025-03-01 19:56:34 | Cherry AI | INFO | memory.py:50 | Initialized in-memory storage
+2025-03-01 19:56:34 | Cherry AI | INFO | bootstrap.py:27 | Bootstrapping Cherry AI...
+2025-03-01 19:56:34 | Cherry AI | INFO | memory_chroma.py:23 | 🍒 ChromaMemory initialized with collection 'cherry_primary_memory' at './chroma_db'
+2025-03-01 19:56:34 | Cherry AI | INFO | orchestrator.py:57 | Memory initialized successfully.
+2025-03-01 19:56:34 | Cherry AI | INFO | orchestrator.py:63 | AdvancedOrchestrator running...
+2025-03-01 20:04:04 | Cherry AI | INFO | orchestrator.py:67 | AdvancedOrchestrator stopped.
+2025-03-01 20:04:06 | Cherry AI | INFO | logger.py:52 | ✅ Logger initialized successfully with level 'INFO'
+2025-03-01 20:04:07 | Cherry AI | INFO | memory.py:50 | Initialized in-memory storage
+2025-03-01 20:04:07 | Cherry AI | INFO | bootstrap.py:27 | Bootstrapping Cherry AI...
+2025-03-01 20:04:07 | Cherry AI | INFO | memory_chroma.py:23 | 🍒 ChromaMemory initialized with collection 'cherry_primary_memory' at './chroma_db'
+2025-03-01 20:04:07 | Cherry AI | INFO | orchestrator.py:57 | Memory initialized successfully.
+2025-03-01 20:04:07 | Cherry AI | INFO | orchestrator.py:63 | AdvancedOrchestrator running...
+2025-03-01 20:04:07 | Cherry AI | INFO | api.py:106 | API routes initialized
+2025-03-01 20:04:08 | Cherry AI | INFO | logger.py:52 | ✅ Logger initialized successfully with level 'INFO'
+2025-03-01 20:04:09 | Cherry AI | INFO | memory.py:50 | Initialized in-memory storage
+2025-03-01 20:04:09 | Cherry AI | INFO | bootstrap.py:27 | Bootstrapping Cherry AI...
+2025-03-01 20:04:09 | Cherry AI | INFO | memory_chroma.py:23 | 🍒 ChromaMemory initialized with collection 'cherry_primary_memory' at './chroma_db'
+2025-03-01 20:04:09 | Cherry AI | INFO | orchestrator.py:57 | Memory initialized successfully.
+2025-03-01 20:04:09 | Cherry AI | INFO | orchestrator.py:63 | AdvancedOrchestrator running...
+2025-03-01 20:04:09 | Cherry AI | INFO | api.py:106 | API routes initialized
+2025-03-01 20:39:53 | Cherry AI | INFO | logger.py:52 | ✅ Logger initialized successfully with level 'INFO'
+2025-03-01 20:39:55 | Cherry AI | INFO | memory.py:50 | Initialized in-memory storage
+2025-03-01 20:39:55 | Cherry AI | INFO | bootstrap.py:27 | Bootstrapping Cherry AI...
+2025-03-01 20:39:56 | Cherry AI | INFO | memory_chroma.py:23 | 🍒 ChromaMemory initialized with collection 'cherry_primary_memory' at './chroma_db'
+2025-03-01 20:39:56 | Cherry AI | INFO | orchestrator.py:57 | Memory initialized successfully.
+2025-03-01 20:39:56 | Cherry AI | INFO | orchestrator.py:63 | AdvancedOrchestrator running...
+2025-03-01 20:39:56 | Cherry AI | INFO | api.py:106 | API routes initialized
+2025-03-01 20:39:56 | Cherry AI | INFO | main.py:12 | 🍒 Cherry AI v0.1.0 starting up...
+2025-03-01 20:39:56 | Cherry AI | INFO | main.py:23 | 🔑 Loaded API keys: OpenAI, Elevenlabs, Gemini, Grok
+2025-03-02 18:21:10 | Cherry AI | INFO | logger.py:52 | ✅ Logger initialized successfully with level 'INFO'
+2025-03-02 18:23:07 | Cherry AI | INFO | logger.py:52 | ✅ Logger initialized successfully with level 'INFO'
+2025-03-02 18:29:33 | Cherry AI | INFO | logger.py:52 | ✅ Logger initialized successfully with level 'INFO'
+2025-03-02 18:29:34 | Cherry AI | INFO | memory.py:50 | Initialized in-memory storage
+2025-03-02 18:29:34 | Cherry AI | INFO | bootstrap.py:27 | Bootstrapping Cherry AI...
+2025-03-02 18:29:34 | Cherry AI | INFO | memory_chroma.py:23 | 🍒 ChromaMemory initialized with collection 'cherry_primary_memory' at './chroma_db'
+2025-03-02 18:29:34 | Cherry AI | INFO | orchestrator.py:57 | Memory initialized successfully.
+2025-03-02 18:29:34 | Cherry AI | INFO | orchestrator.py:63 | AdvancedOrchestrator running...
+2025-03-02 18:29:34 | Cherry AI | INFO | api.py:106 | API routes initialized
+2025-03-02 18:29:34 | Cherry AI | INFO | main.py:12 | 🍒 Cherry AI v0.1.0 starting up...
+2025-03-02 18:29:34 | Cherry AI | INFO | main.py:23 | 🔑 Loaded API keys: OpenAI, Elevenlabs, Gemini, Grok
+2025-03-02 18:39:14 | Cherry AI | INFO | logger.py:52 | ✅ Logger initialized successfully with level 'INFO'
+2025-03-02 18:39:14 | Cherry AI | INFO | memory.py:50 | Initialized in-memory storage
+2025-03-02 18:39:14 | Cherry AI | INFO | bootstrap.py:27 | Bootstrapping Cherry AI...
+2025-03-02 18:39:14 | Cherry AI | INFO | memory_chroma.py:23 | 🍒 ChromaMemory initialized with collection 'cherry_primary_memory' at './chroma_db'
+2025-03-02 18:39:14 | Cherry AI | INFO | orchestrator.py:57 | Memory initialized successfully.
+2025-03-02 18:39:14 | Cherry AI | INFO | orchestrator.py:63 | AdvancedOrchestrator running...
+2025-03-02 18:39:14 | Cherry AI | INFO | api.py:106 | API routes initialized
