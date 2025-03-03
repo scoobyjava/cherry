@@ -1,0 +1,117 @@
+.
+├── README.md
+├── __pycache__
+│   ├── bootstrap.cpython-312.pyc
+│   ├── config.cpython-312.pyc
+│   ├── logger.cpython-312.pyc
+│   ├── memory_chroma.cpython-312.pyc
+│   └── orchestrator.cpython-312.pyc
+├── agent.py
+├── agents
+│   ├── base.py
+│   └── researcher.py
+├── api.log
+├── api.py
+├── application_20250303_181239.log
+├── bootstrap.py
+├── cherry
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   └── __init__.cpython-312.pyc
+│   ├── core
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   │   ├── __init__.cpython-312.pyc
+│   │   │   └── orchestrator.cpython-312.pyc
+│   │   ├── cli.py
+│   │   └── orchestrator.py
+│   ├── main.py
+│   └── memory
+│       └── __init__.py
+├── cherry_ai.log
+├── chroma_db
+│   ├── 039391bb-2b9f-478b-b190-e7ea47848840
+│   │   ├── data_level0.bin
+│   │   ├── header.bin
+│   │   ├── length.bin
+│   │   └── link_lists.bin
+│   └── chroma.sqlite3
+├── config.py
+├── context.txt
+├── dependencies.txt
+├── env.example
+├── file_structure.txt
+├── gather_context.sh
+├── logger.py
+├── logger_context.py
+├── logs
+│   └── application_20250303_181932.log
+├── main_script.py
+├── memory.py
+├── memory_chroma.py
+├── orchestrator.py
+├── requirements.txt
+├── sqlite-autoconf-3450300
+│   ├── INSTALL
+│   ├── Makefile
+│   ├── Makefile.am
+│   ├── Makefile.fallback
+│   ├── Makefile.in
+│   ├── Makefile.msc
+│   ├── README.txt
+│   ├── Replace.cs
+│   ├── aclocal.m4
+│   ├── compile
+│   ├── config.guess
+│   ├── config.status
+│   ├── config.sub
+│   ├── configure
+│   ├── configure.ac
+│   ├── depcomp
+│   ├── install-sh
+│   ├── libsqlite3.la
+│   ├── libtool
+│   ├── ltmain.sh
+│   ├── missing
+│   ├── shell.c
+│   ├── sqlite3
+│   ├── sqlite3-shell.o
+│   ├── sqlite3-sqlite3.o
+│   ├── sqlite3.1
+│   ├── sqlite3.c
+│   ├── sqlite3.h
+│   ├── sqlite3.lo
+│   ├── sqlite3.o
+│   ├── sqlite3.pc
+│   ├── sqlite3.pc.in
+│   ├── sqlite3.rc
+│   ├── sqlite3ext.h
+│   ├── sqlite3rc.h
+│   └── tea
+│       ├── Makefile.in
+│       ├── README
+│       ├── aclocal.m4
+│       ├── configure
+│       ├── configure.ac
+│       ├── doc
+│       │   └── sqlite3.n
+│       ├── generic
+│       │   └── tclsqlite3.c
+│       ├── license.terms
+│       ├── pkgIndex.tcl.in
+│       ├── tclconfig
+│       │   ├── install-sh
+│       │   └── tcl.m4
+│       └── win
+│           ├── makefile.vc
+│           ├── nmakehlp.c
+│           └── rules.vc
+├── sqlite-autoconf-3450300.tar.gz
+├── start_cherry.sh
+├── test.js
+├── workspaces
+│   └── cherry
+│       └── main.py
+└── your_database.db
+
+18 directories, 96 files
