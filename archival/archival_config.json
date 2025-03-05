@@ -1,0 +1,21 @@
+{
+    "archival": {
+        "age_threshold_days": 180,
+        "schedule": "0 3 * * *",
+        "batch_size": 1000,
+        "dry_run": false,
+        "namespaces_to_archive": ["search_agent", "recommendation_agent", "qa_agent"],
+        "logging": {
+            "level": "INFO",
+            "file_path": "/var/log/cherry/archival.log",
+            "retention_days": 30
+        }
+    },
+    "tables": {
+        "archived_vectors": {
+            "search_agent": "archived_search_vectors",
+            "recommendation_agent": "archived_recommendation_vectors",
+            "qa_agent": "archived_qa_vectors"
+        }
+    }
+}

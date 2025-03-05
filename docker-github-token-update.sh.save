@@ -1,0 +1,2 @@
+# Paste script content in, then save and exit nano with Ctrl+O, Ctrl+X.
+chmod +x docker-github-token-update.sh

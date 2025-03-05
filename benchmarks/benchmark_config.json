@@ -1,0 +1,121 @@
+{
+    /**
+     * Main configuration for benchmark application
+     * Controls settings for all benchmark services, components, and behaviors
+     */
+    "app": {
+        /**
+         * Configuration for external services used during benchmarks
+         * Includes vector databases, relational databases, and AI services
+         */
+        "services": {
+            /**
+             * Pinecone vector database configuration for memory benchmarks
+             * Used for storing and retrieving embeddings for various agent types
+             */
+            "pinecone": {
+                "index_name": "memory-benchmark",
+                "default_top_k": "${DEFAULT_PINECONE_TOP_K}", // Reference to defaults
+                "namespaces": {
+                    "search_agent": {
+                        "description": "Namespace for search-related vectors",
+                        "metadata_schema": {
+                            "source_type": "string", // Type of content source (web, database, etc.)
+                            "timestamp": "number", // Unix timestamp of when the vector was created
+                            "relevance_score": "number", // Pre-calculated relevance metric (0-1)
+                            "category": "string" // Content category for filtering
+                        },
+                        "default_top_k": "${DEFAULT_SEARCH_TOP_K}" // Reference to defaults
+                    },
+                    "recommendation_agent": {
+                        "description": "Namespace for recommendation vectors",
+                        "metadata_schema": {
+                            "user_id": "string", // Unique identifier for user
+                            "item_id": "string", // Unique identifier for recommended item
+                            "interaction_type": "string", // E.g., "click", "purchase", "view"
+                            "timestamp": "number" // When the interaction occurred
+                        },
+                        "default_top_k": "${DEFAULT_RECOMMENDATION_TOP_K}" // Reference to defaults
+                    },
+                    "qa_agent": {
+                        "description": "Namespace for question-answering vectors",
+                        "metadata_schema": {
+                            "document_id": "string", // Source document identifier
+                            "section_id": "string", // Specific section within document
+                            "confidence": "number", // Model confidence in answer (0-1)
+                            "last_updated": "number" // When the vector was last updated
+                        },
+                        "default_top_k": "${DEFAULT_QA_TOP_K}" // Reference to defaults
+                    }
+                }
+            },
+            /**
+             * PostgreSQL database configuration
+             * Used for storing structured benchmark data and results
+             */
+            "postgres": {
+                "database": "${POSTGRES_DB}", // Environment variable reference for database name
+                "query_settings": {
+                    "statement_timeout_ms": "${POSTGRES_QUERY_TIMEOUT}" // Reference to defaults
+                }
+            },
+            /**
+             * OpenAI API configuration
+             * Controls model selection and response parameters
+             */
+            "openai": {
+                "default_model": "${OPENAI_DEFAULT_MODEL}", // Reference to defaults
+                "max_tokens": "${OPENAI_MAX_TOKENS}" // Reference to defaults
+            }
+        },
+        /**
+         * Feature flags for enabling/disabling benchmark components
+         * Use these to control which features are active during tests
+         */
+        "feature_flags": {
+            "security_scanning": {
+                "checkov": true, // Enable infrastructure-as-code security scanning
+                "dependency_scan": true // Enable dependency vulnerability scanning
+            },
+            "profiling": {
+                "enabled": true, // Master switch for all profiling
+                "cpu_profiling": true, // Track CPU usage during benchmarks
+                "memory_profiling": true // Track memory consumption during benchmarks
+            }
+        },
+        /**
+         * Validation rules for configuration values
+         * Ensures that provided settings are within acceptable ranges
+         */
+        "validation": {
+            "port_ranges": {
+                "min": "${MIN_PORT}", // Reference to defaults
+                "max": "${MAX_PORT}" // Reference to defaults
+            },
+            "cron_expressions": {
+                "validate_before_apply": true // Verify cron syntax before scheduling
+            }
+        },
+        /**
+         * Error handling configuration
+         * Controls how the application responds to failures during benchmarks
+         */
+        "exception_handling": {
+            "enabled": true, // Master switch for exception handling features
+            "log_level": "error", // Minimum level for logging exceptions
+            "metrics_collection": true, // Track exception metrics
+            "alert_on_consecutive_failures": "${ALERT_CONSECUTIVE_FAILURES}", // Reference to defaults
+            /**
+             * Circuit breaker pattern implementation
+             * Prevents cascading failures by stopping requests after error threshold
+             */
+            "circuit_breaker": {
+                "enabled": true, // Enable circuit breaker pattern
+                "threshold_percentage": "${CIRCUIT_BREAKER_THRESHOLD}", // Reference to defaults
+                "min_request_count": "${CIRCUIT_BREAKER_MIN_REQUESTS}", // Reference to defaults
+                "window_size_seconds": "${CIRCUIT_BREAKER_WINDOW}", // Reference to defaults
+                "sleep_window_ms": "${CIRCUIT_BREAKER_SLEEP}" // Reference to defaults
+            }
+        }
+    }
+}

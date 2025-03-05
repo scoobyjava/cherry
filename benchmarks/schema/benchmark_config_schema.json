@@ -1,0 +1,112 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Benchmark Configuration Schema",
+  "description": "Schema for the Cherry benchmark configuration file",
+  "type": "object",
+  "properties": {
+    "app": {
+      "type": "object",
+      "description": "Main configuration for benchmark application",
+      "properties": {
+        "services": {
+          "type": "object",
+          "description": "Configuration for external services used during benchmarks",
+          "properties": {
+            "pinecone": {
+              "type": "object",
+              "description": "Pinecone vector database configuration for memory benchmarks",
+              "required": ["index_name", "namespaces"],
+              "properties": {
+                "index_name": {
+                  "type": "string",
+                  "description": "Name of the Pinecone index to use"
+                },
+                "default_top_k": {
+                  "type": "integer",
+                  "description": "Default number of results to return from queries",
+                  "minimum": 1
+                },
+                "namespaces": {
+                  "type": "object",
+                  "description": "Namespace configurations for different vector types",
+                  "additionalProperties": {
+                    "type": "object",
+                    "required": ["description", "metadata_schema"],
+                    "properties": {
+                      "description": {
+                        "type": "string",
+                        "description": "Purpose of this namespace"
+                      },
+                      "metadata_schema": {
+                        "type": "object",
+                        "description": "Schema of metadata fields for vectors in this namespace",
+                        "additionalProperties": {
+                          "type": "string",
+                          "enum": ["string", "number", "boolean"]
+                        }
+                      },
+                      "default_top_k": {
+                        "type": "integer",
+                        "description": "Namespace-specific number of results to return",
+                        "minimum": 1
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "postgres": {
+              "type": "object",
+              "description": "PostgreSQL database configuration",
+              "properties": {
+                "database": {
+                  "type": "string",
+                  "description": "Database name, supports environment variable substitution"
+                },
+                "query_settings": {
+                  "type": "object",
+                  "properties": {
+                    "statement_timeout_ms": {
+                      "type": "integer",
+                      "description": "Maximum query execution time in milliseconds",
+                      "minimum": 0
+                    }
+                  }
+                }
+              }
+            },
+            "openai": {
+              "type": "object",
+              "description": "OpenAI API configuration",
+              "properties": {
+                "default_model": {
+                  "type": "string",
+                  "description": "Default model to use when not specified"
+                },
+                "max_tokens": {
+                  "type": "integer",
+                  "description": "Maximum token length for responses",
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        },
+        "feature_flags": {
+          "type": "object",
+          "description": "Feature flags for enabling/disabling benchmark components"
+        },
+        "validation": {
+          "type": "object",
+          "description": "Validation rules for configuration values"
+        },
+        "exception_handling": {
+          "type": "object",
+          "description": "Error handling configuration"
+        }
+      },
+      "required": ["services"]
+    }
+  },
+  "required": ["app"]
+}

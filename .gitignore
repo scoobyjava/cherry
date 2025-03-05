@@ -1,16 +1,16 @@
-# Python cache and compiled files
+# Environment variables and secrets
+.env
+*.env
+.secrets
+credentials.json
+
+# Python artifacts
 __pycache__/
 *.py[cod]
 *$py.class
-*.pyo
-*.pyd
+*.so
 .Python
-
-# Virtual environments
 env/
-.venv/
-venv/
-ENV/
 build/
 develop-eggs/
 dist/
@@ -22,79 +22,37 @@ lib64/
 parts/
 sdist/
 var/
+wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-pip-wheel-metadata/
 
-# IDEs and editors
-.vscode/
+# Virtual environments
+venv/
+ENV/
+env/
+
+# IDE specific files
 .idea/
-*.sublime-workspace
-*.sublime-project
+.vscode/
 *.swp
 *.swo
-*.swn
-*.tmp
+*~
+.DS_Store
 
-# Jupyter Notebook checkpoints
-.ipynb_checkpoints
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
 
-# Environment files
-.env
-.env.*
-*.env
+# Chroma DB files if using local instance
+.chroma/
+chroma_data/
 
 # Logs
 *.log
 logs/
-*.sqlite3
-*.db
-
-# macOS specific
-.DS_Store
-.AppleDouble
-.LSOverride
-Icon?
-._*
-.Spotlight-V100
-.Trashes
-._.DS_Store
-
-# Windows specific
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
-*.cab
-*.msi
-*.msix
-*.msm
-*.msp
-*.lnk
-
-# Linux specific
-*~
-
-# Node.js (if relevant)
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-package-lock.json
-yarn.lock
-
-# Coverage and test files
-coverage.xml
-htmlcov/
-.pytest_cache/
-.coverage
-.cache
-pytestdebug.log
-
-# Miscellaneous
-*.bak
-*.orig
-*.tmp
-*.temp

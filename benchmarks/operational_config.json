@@ -1,0 +1,142 @@
+{
+    "operations": {
+        "backup": {
+            "pinecone": {
+                "enabled": true,
+                "schedule": "0 2 * * *",
+                "retention_days": 7,
+                "validation": {
+                    "verify_after_backup": true,
+                    "notify_on_failure": true
+                },
+                "storage_path": "${BACKUP_BASE_PATH}/pinecone"
+            },
+            "postgres": {
+                "enabled": true,
+                "schedule": "0 1 * * *",
+                "retention_days": 30,
+                "location": "${BACKUP_BASE_PATH}/postgres",
+                "compression": true,
+                "validation": {
+                    "verify_integrity": true,
+                    "alert_on_failure": true
+                }
+            }
+        },
+        "high_availability": {
+            "pinecone": {
+                "enabled": true,
+                "replica_zones": ["us-east1-gcp", "eu-west1-gcp"],
+                "failover": {
+                    "auto_failover": true,
+                    "max_failover_time_seconds": 60,
+                    "health_check_interval_seconds": 30
+                }
+            },
+            "postgres": {
+                "enabled": true,
+                "mode": "streaming",
+                "replicas": [
+                    {
+                        "host": "pg-replica-1",
+                        "port": 5432,
+                        "priority": 1
+                    },
+                    {
+                        "host": "pg-replica-2",
+                        "port": 5432,
+                        "priority": 2
+                    }
+                ],
+                "sync_commit": "on",
+                "max_lag_ms": 30000,
+                "automatic_failover": true,
+                "monitoring": {
+                    "check_interval_ms": 15000,
+                    "failover_threshold": 3,
+                    "recovery_wait_ms": 60000
+                }
+            }
+        },
+        "monitoring": {
+            "common": {
+                "sampling_rate": 0.1,
+                "reporting": {
+                    "interval_ms": 60000,
+                    "detailed_metrics": true,
+                    "log_level": "info",
+                    "export_format": ["prometheus", "json"]
+                },
+                "alerting": {
+                    "threshold_cpu_percent": 80,
+                    "threshold_memory_percent": 85,
+                    "threshold_latency_ms": 1000,
+                    "notification_channels": ["email", "slack"]
+                }
+            },
+            "pinecone": {
+                "metrics_collection_interval_seconds": 30,
+                "slow_query_threshold_ms": 500,
+                "log_slow_queries": true
+            }
+        },
+        "rate_limiting": {
+            "openai": {
+                "requests_per_minute": 60,
+                "tokens_per_minute": 40000,
+                "retry_on_limit": true,
+                "max_retries": 3,
+                "backoff_ms": 2000,
+                "adaptive_rate_limiting": {
+                    "enabled": true,
+                    "target_success_rate": 0.95,
+                    "adjustment_factor": 0.1,
+                    "cooldown_period_seconds": 60
+                }
+            }
+        },
+        "batch_processing": {
+            "openai": {
+                "enabled": true,
+                "max_batch_size": 20,
+                "batch_timeout_ms": 500
+            }
+        },
+        "quality_gate": {
+            "sonarqube": {
+                "wait": true,
+                "timeout_minutes": 5,
+                "analysis": {
+                    "coverage_exclusions": "**/node_modules/**,**/dist/**,**/build/**,**/*.test.js,**/*.spec.js",
+                    "source_encoding": "UTF-8"
+                }
+            }
+        },
+        "security_scanning": {
+            "checkov": {
+                "version": "latest",
+                "skip_checks": ["CKV_AWS_123", "CKV_GCP_45"],
+                "frameworks": ["terraform", "cloudformation", "kubernetes", "dockerfile", "helm"],
+                "output_formats": ["cli", "json", "junitxml"],
+                "output_directory": "./reports/checkov",
+                "soft_fail": false,
+                "baseline": "./security/checkov_baseline.json"
+            },
+            "dependency_scan": {
+                "outputDir": "./reports/dependency-scan",
+                "outputFormat": "json",
+                "severityThreshold": "moderate",
+                "ignoreDevDependencies": false,
+                "failOnVulnerabilities": true,
+                "exclusions": [
+                    "CWE-1234",
+                    "GHSA-abcd-efgh-ijkl"
+                ]
+            }
+        },
+        "secret_management": {
+            "refresh_interval_ms": 3600000,
+            "fail_if_missing": true
+        }
+    }
+}

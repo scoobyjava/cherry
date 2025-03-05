@@ -1,0 +1,32 @@
+{
+    "retry_strategies": {
+        "default": {
+            "max_attempts": 3,
+            "initial_backoff_ms": 1000,
+            "max_backoff_ms": 10000,
+            "exponential_backoff": true,
+            "jitter": true
+        },
+        "critical_services": {
+            "max_attempts": 5,
+            "initial_backoff_ms": 2000,
+            "max_backoff_ms": 30000,
+            "exponential_backoff": true,
+            "jitter": true
+        },
+        "database": {
+            "max_attempts": 3,
+            "initial_backoff_ms": 500,
+            "max_backoff_ms": 5000,
+            "exponential_backoff": true,
+            "jitter": false
+        },
+        "api_calls": {
+            "max_attempts": 3,
+            "initial_backoff_ms": 1000,
+            "max_backoff_ms": 15000,
+            "exponential_backoff": true,
+            "jitter": true
+        }
+    }
+}

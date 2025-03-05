@@ -1,0 +1,38 @@
+name: Security Scanning
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 2 * * 1'  # Run every Monday at 2 AM
+
+jobs:
+  checkov:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install and Run Checkov
+        run: |
+          python3 security/run_checkov.py
+        env:
+          # Pass any necessary secrets from GitHub
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Upload Checkov Results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: checkov-results
+          path: reports/checkov/
+          retention-days: 7

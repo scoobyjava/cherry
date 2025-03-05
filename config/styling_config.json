@@ -1,0 +1,129 @@
+{
+    /**
+     * Main styling configuration for the Cherry project
+     * Controls framework settings, design principles, and platform targets
+     */
+    "styling": {
+        /**
+         * CSS Framework configuration
+         * Tailwind CSS is the selected framework for this project
+         */
+        "framework": {
+            "name": "Tailwind CSS",
+            "version": "3.x",
+            "config_file": "tailwind.config.js",
+            "use_jit_mode": true,
+            "plugins": [
+                "typography",
+                "forms",
+                "aspect-ratio",
+                "line-clamp"
+            ],
+            "custom_extensions": []
+        },
+        /**
+         * Design principles to follow throughout the project
+         * These principles guide all visual and interaction designs
+         */
+        "design_principles": [
+            {
+                "name": "Minimalism",
+                "description": "Focus on essential elements, reduce clutter",
+                "guidelines": [
+                    "Use whitespace effectively",
+                    "Limit color palette",
+                    "Focus on content hierarchy"
+                ]
+            },
+            {
+                "name": "Clean Design",
+                "description": "Create clear, organized interfaces",
+                "guidelines": [
+                    "Consistent alignment",
+                    "Clear visual hierarchy",
+                    "Purposeful animations"
+                ]
+            },
+            {
+                "name": "Accessibility",
+                "description": "Ensure interfaces are usable by everyone",
+                "guidelines": [
+                    "WCAG 2.1 AA compliance",
+                    "Keyboard navigation support",
+                    "Screen reader compatible",
+                    "Sufficient color contrast"
+                ]
+            },
+            {
+                "name": "Responsive",
+                "description": "Adapt seamlessly to different screen sizes",
+                "guidelines": [
+                    "Mobile-first approach",
+                    "Fluid layouts",
+                    "Breakpoint consistency"
+                ]
+            }
+        ],
+        /**
+         * Target platforms for the application
+         * Includes specific considerations for each platform
+         */
+        "target_platforms": [
+            {
+                "name": "Web",
+                "browsers": [
+                    "Chrome", "Firefox", "Safari", "Edge"
+                ],
+                "min_resolution": "320px",
+                "breakpoints": {
+                    "sm": "640px",
+                    "md": "768px",
+                    "lg": "1024px",
+                    "xl": "1280px",
+                    "2xl": "1536px"
+                }
+            },
+            {
+                "name": "Mobile",
+                "platforms": [
+                    "iOS", "Android"
+                ],
+                "orientation_support": ["portrait", "landscape"],
+                "touch_targets": "min 44px x 44px"
+            }
+        ],
+        /**
+         * Theme configuration
+         * Defines color schemes and typography
+         */
+        "theme": {
+            "color_scheme": {
+                "primary": {
+                    "light": "#4f46e5",
+                    "dark": "#818cf8"
+                },
+                "secondary": {
+                    "light": "#0ea5e9",
+                    "dark": "#38bdf8"
+                },
+                "neutral": {
+                    "light": "#f9fafb",
+                    "dark": "#1f2937"
+                },
+                "accent": {
+                    "light": "#ec4899",
+                    "dark": "#f472b6"
+                }
+            },
+            "typography": {
+                "font_family": {
+                    "sans": "Inter, ui-sans-serif, system-ui",
+                    "serif": "ui-serif, Georgia",
+                    "mono": "ui-monospace, SFMono-Regular"
+                },
+                "base_font_size": "16px",
+                "scale_ratio": 1.25
+            }
+        }
+    }
+}

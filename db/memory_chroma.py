@@ -1,107 +1,80 @@
-# memory_chroma.py
-import chromadb
-import time
 import os
-from typing import List, Dict, Any, Optional
-from logger import logger
-from config import Config
-import numpy as np
+import requests
+import base64
+from dotenv import load_dotenv
 
-class ChromaMemory:
-    """Persistent memory module using ChromaDB vector storage."""
+# Load GitHub token securely from .env
+load_dotenv()
+GITHUB_TOKEN = os.getenv('CHERRY_GH_TOKEN')
+REPO_OWNER = 'ai-cherry'
+REPO_NAME = 'cherry'
 
-    def __init__(self,
-                 collection_name: str = "cherry_memory",
-                 persist_directory: Optional[str] = None):
-        self.persist_directory = persist_directory or Config.CHROMADB_PERSIST_DIRECTORY
-        self.collection_name = collection_name
-        os.makedirs(self.persist_directory, exist_ok=True)
+# Validate GitHub token immediately
+if not GITHUB_TOKEN:
+    raise EnvironmentError('GitHub token (CHERRY_GH_TOKEN) not found. Check your .env file.')
 
-        try:
-            self.client = chromadb.PersistentClient(path=self.persist_directory)
-            self.collection = self.client.get_or_create_collection(name=self.collection_name)
-            logger.info(f"🍒 ChromaMemory initialized with collection '{self.collection_name}' at '{self.persist_directory}'")
-        except Exception as e:
-            logger.error(f"🚨 Failed initializing ChromaMemory: {e}")
-            raise
+# GitHub API headers
+headers = {
+    'Authorization': f'token {GITHUB_TOKEN}',
+    'Accept': 'application/vnd.github.v3+json'
+}
 
-    def insert_text(self,
-                    text: str,
-                    embedding: List[float],
-                    metadata: Optional[Dict[str, Any]] = None,
-                    doc_id: Optional[str] = None) -> str:
-        metadata = metadata or {}
-        metadata["timestamp"] = time.time()
-        if isinstance(embedding, np.ndarray):
-            embedding = embedding.tolist()
-        doc_id = doc_id or f"doc_{int(time.time() * 1000)}"
 
-        try:
-            self.collection.add(
-                embeddings=[embedding],
-                documents=[text],
-                metadatas=[metadata],
-                ids=[doc_id]
-            )
-            logger.debug(f"✅ Inserted document '{doc_id}' successfully.")
-            return doc_id
-        except Exception as e:
-            logger.error(f"🚨 Error inserting document '{doc_id}': {e}")
-            raise
+def create_branch(new_branch, source_branch='main'):
+    print(f'Creating branch "{new_branch}" from "{source_branch}".')
 
-    def search_similar(self,
-                       query_embedding: List[float],
-                       limit: int = 5,
-                       filter_criteria: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
-        if isinstance(query_embedding, np.ndarray):
-            query_embedding = query_embedding.tolist()
+    source_branch_url = f'https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/git/refs/heads/{source_branch}'
+    response = requests.get(source_branch_url, headers=headers)
 
-        try:
-            results = self.collection.query(
-                query_embeddings=[query_embedding],
-                n_results=limit,
-                where=filter_criteria
-            )
-            documents = results.get("documents", [[]])[0]
-            metadatas = results.get("metadatas", [[]])[0]
-            ids = results.get("ids", [[]])[0]
-            distances = results.get("distances", [[]])[0]
+    if response.status_code == 404:
+        raise ValueError(f'Source branch "{source_branch}" not found.')
+    elif not response.ok:
+        raise RuntimeError(f'Failed to retrieve source branch: {response.json()}')
 
-            formatted_results = [
-                {
-                    "id": doc_id,
-                    "document": doc,
-                    "metadata": meta,
-                    "distance": dist
-                }
-                for doc_id, doc, meta, dist in zip(ids, documents, metadatas, distances)
-            ]
+    sha = response.json()['object']['sha']
 
-            logger.debug(f"🔍 Found {len(formatted_results)} similar documents.")
-            return formatted_results
-        except Exception as e:
-            logger.error(f"🚨 Error during similarity search: {e}")
-            raise
+    create_branch_url = f'https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/git/refs'
+    response = requests.post(create_branch_url, json={
+        'ref': f'refs/heads/{new_branch}',
+        'sha': sha
+    }, headers=headers)
 
-    def delete_document(self, doc_id: str) -> bool:
-        try:
-            self.collection.delete(ids=[doc_id])
-            logger.debug(f"🗑️ Deleted document '{doc_id}' successfully.")
-            return True
-        except Exception as e:
-            logger.error(f"🚨 Error deleting document '{doc_id}': {e}")
-            return False
+    if response.status_code != 201:
+        raise RuntimeError(f'Error creating branch: {response.json()}')
 
-    def collection_stats(self) -> Dict[str, Any]:
-        try:
-            total_docs = len(self.collection.get().get("ids", []))
-            stats = {
-                "collection_name": self.collection.name,
-                "document_count": total_docs,
-                "persist_directory": self.persist_directory
-            }
-            logger.info(f"📊 Collection stats: {stats}")
-            return stats
-        except Exception as e:
-            logger.error(f"🚨 Error fetching collection stats: {e}")
-            return {"error": str(e)}
+    print(f'Branch "{new_branch}" created successfully.')
+
+
+def commit_file(branch_name, file_path, file_content, commit_message='Automated commit via ChatGPT plugin'):
+    file_url = f'https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{file_path}'
+    response = requests.get(file_url, params={'ref': branch_name}, headers=headers)
+
+    sha = response.json().get('sha') if response.ok else None
+
+    encoded_content = base64.b64encode(file_content.encode('utf-8')).decode('utf-8')
+
+    data = {
+        'message': commit_message,
+        'content': encoded_content,
+        'branch': branch_name
+    }
+
+    if sha:
+        data['sha'] = sha
+
+    response = requests.put(file_url, headers=headers, json=data)
+
+    if response.status_code not in [200, 201]:
+        raise RuntimeError(f'Error committing file: {response.json()}')
+
+    print(f'File "{file_path}" committed successfully to branch "{branch_name}".')
+
+
+if __name__ == '__main__':
+    test_branch = 'feature/chatgpt-plugin'
+    create_branch(test_branch)
+    commit_file(
+        branch_name=test_branch,
+        file_path='scripts/example.py',
+        file_content='print("Hello, GitHub via ChatGPT!")'
+    )

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # base_agent.py
 from abc import ABC, abstractmethod
 from typing import Dict, Any, List, Optional
@@ -30,3 +31,18 @@ class Agent(ABC):
 
     def __str__(self):
         return f"{self.name}: {self.description}"
+=======
+from abc import ABC, abstractmethod
+from typing import List, Dict, Any
+from cherry.memory.manager import MemoryManager
+
+class BaseAgent(ABC):
+    def __init__(self, name: str, memory_manager: MemoryManager):
+        self.name = name
+        self.memory_manager = memory_manager
+    
+    @abstractmethod
+    def handle_task(self, task: str) -> str:
+        """Process the given task and return a response or result."""
+        pass
+>>>>>>> 998ee46 (Initial commit)

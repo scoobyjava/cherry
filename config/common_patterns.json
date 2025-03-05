@@ -1,0 +1,36 @@
+{
+  "connection": {
+    "basic": {
+      "timeout_ms": 5000,
+      "retry": {
+        "max_attempts": 3,
+        "backoff_ms": 1000
+      }
+    },
+    "extended": {
+      "timeout_seconds": 30,
+      "retry": {
+        "max_attempts": 5,
+        "initial_delay_ms": 1000,
+        "max_delay_ms": 30000
+      }
+    }
+  },
+  "backup": {
+    "standard": {
+      "enabled": true,
+      "retention_days": 7,
+      "validation": {
+        "verify_after_backup": true,
+        "notify_on_failure": true
+      }
+    }
+  },
+  "namespace": {
+    "default": {
+      "vector_count_limit": 100000,
+      "default_top_k": 5,
+      "limit_handling": "evict_oldest"
+    }
+  }
+}

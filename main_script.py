@@ -144,6 +144,3 @@ def main():
         logger.error(f"❌ Unexpected error in computation: {str(e)}")
     
     logger.info("👋 Application shutting down normally")
-
-if __name__ == "__main__":
-    main()

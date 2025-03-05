@@ -1,0 +1,38 @@
+{
+    "service_dependencies": {
+        "search_agent": {
+            "required": ["pinecone", "openai"],
+            "optional": ["postgres"]
+        },
+        "recommendation_agent": {
+            "required": ["pinecone", "postgres"],
+            "optional": ["openai"]
+        },
+        "qa_agent": {
+            "required": ["pinecone", "openai"],
+            "optional": []
+        }
+    },
+    "startup_order": [
+        "postgres",
+        "pinecone",
+        "openai",
+        "search_agent",
+        "recommendation_agent",
+        "qa_agent"
+    ],
+    "shutdown_order": [
+        "qa_agent",
+        "recommendation_agent", 
+        "search_agent",
+        "openai",
+        "pinecone",
+        "postgres"
+    ],
+    "health_checks": {
+        "dependencies": {
+            "check_all_dependencies": true,
+            "fail_if_dependency_unhealthy": true
+        }
+    }
+}

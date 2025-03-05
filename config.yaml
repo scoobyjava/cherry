@@ -1,0 +1,16 @@
+app_name: Cherry AI
+debug: false
+
+logging:
+  level: INFO
+  file_path: logs/cherry_ai.log
+
+memory:
+  provider: chroma
+  persist_directory: chroma_db
+  embedding_function: openai
+
+llm:
+  provider: openai
+  model: gpt-4
+  temperature: 0.7

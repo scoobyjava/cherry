@@ -1,0 +1,111 @@
+{
+    "infrastructure": {
+        "pinecone": {
+            "api_key": "${PINECONE_API_KEY}",
+            "environment": "${PINECONE_ENVIRONMENT}",
+            "connection": {
+                "timeout_ms": 3000,
+                "retry": {
+                    "max_attempts": 3,
+                    "backoff_ms": 1000,
+                    "exponential_backoff": true
+                },
+                "connection_pool": {
+                    "min_size": 5,
+                    "max_size": 20,
+                    "idle_timeout_ms": 30000
+                }
+            },
+            "vector_storage": {
+                "vector_count_limits": {
+                    "search_agent": 100000,
+                    "recommendation_agent": 150000,
+                    "qa_agent": 75000
+                },
+                "limit_handling": {
+                    "search_agent": "evict_oldest",
+                    "recommendation_agent": "evict_oldest",
+                    "qa_agent": "evict_lowest_confidence"
+                },
+                "caching": {
+                    "enabled": true,
+                    "ttl_seconds": 300,
+                    "max_cache_size_mb": 100
+                },
+                "pagination": {
+                    "enabled": true,
+                    "default_page_size": 100
+                }
+            }
+        },
+        "postgres": {
+            "host": "${POSTGRES_HOST}",
+            "port": 5432,
+            "user": "${POSTGRES_USER}",
+            "password": "${POSTGRES_PASSWORD}",
+            "connection": {
+                "timeout_ms": 15000,
+                "max_connections": 100,
+                "idle_timeout_ms": 60000,
+                "ssl_mode": "require",
+                "connection_pool": {
+                    "enabled": true,
+                    "min_size": 10,
+                    "max_size": 100,
+                    "cleanup_interval_ms": 300000
+                }
+            },
+            "performance": {
+                "query_cache": {
+                    "enabled": true,
+                    "max_size_mb": 200,
+                    "ttl_ms": 600000
+                },
+                "prepared_statements": {
+                    "enabled": true,
+                    "cache_size": 250
+                },
+                "vacuum_settings": {
+                    "auto_vacuum": true,
+                    "analyze_threshold": 50,
+                    "vacuum_threshold": 50
+                }
+            }
+        },
+        "google_cloud": {
+            "project_id": "${GCP_PROJECT_ID}",
+            "credentials_file": "${GCP_CREDENTIALS_PATH}",
+            "connection": {
+                "timeout_ms": 30000,
+                "retry": {
+                    "max_attempts": 5,
+                    "initial_delay_ms": 1000,
+                    "max_delay_ms": 30000
+                }
+            }
+        },
+        "openai": {
+            "api_key": "${OPENAI_API_KEY}",
+            "organization_id": "${OPENAI_ORG_ID}",
+            "connection": {
+                "timeout_ms": 30000,
+                "request_timeout_ms": 120000,
+                "keep_alive": true
+            }
+        },
+        "sonarqube": {
+            "url": "${SONAR_HOST_URL}",
+            "token": "${SONAR_TOKEN}",
+            "project_key": "cherry"
+        },
+        "secret_management": {
+            "provider": "vault",
+            "vault": {
+                "address": "${VAULT_ADDR}",
+                "token_path": "${VAULT_TOKEN_PATH}",
+                "mount_path": "secret",
+                "timeout_ms": 5000
+            }
+        }
+    }
+}

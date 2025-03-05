@@ -1,0 +1,8 @@
+numpy
+pandas
+matplotlib
+psutil
+tqdm
+pinecone-client
+psycopg2-binary
+pgvector

@@ -1,0 +1,31 @@
+{
+  "thresholds": {
+    "cyclomaticComplexity": 10,
+    "maintainabilityIndex": 65,
+    "halsteadDifficulty": 20,
+    "parameterCount": 4
+  },
+  "ignorePatterns": [
+    "/node_modules/",
+    "/dist/",
+    "/build/",
+    "\\.test\\.",
+    "\\.spec\\.",
+    "\\.min\\."
+  ],
+  "reportFormat": "detailed",
+  "customRules": [
+    {
+      "name": "MaxFunctionLength",
+      "description": "Functions should not exceed a certain length",
+      "maxLines": 50,
+      "severity": "warning"
+    },
+    {
+      "name": "MaxFileSize",
+      "description": "Files should not exceed a certain size",
+      "maxKB": 100,
+      "severity": "warning" 
+    }
+  ]
+}
