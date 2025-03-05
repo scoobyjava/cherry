@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from typing import Dict, Any, List, Optional
 from cherry.utils.logger import logger
 from cherry.memory.agent_memory import AgentMemory  # Import the memory module
+from cherry.feedback.system_evaluator import track_task_execution
 
 
 class Agent(ABC):
@@ -18,6 +19,7 @@ class Agent(ABC):
         self.memory = AgentMemory()  # Add memory component
         logger.info(f"✨ Agent initialized: {self.name}")
 
+    @track_task_execution
     @abstractmethod
     async def process(self, task_data: Dict[str, Any]) -> Dict[str, Any]:
         """

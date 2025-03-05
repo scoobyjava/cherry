@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Agent Chat</title>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        #chat { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; }
+        .message { margin: 5px 0; }
+        .agent { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div id="chat">
+        <!-- Chat messages will appear here -->
+    </div>
+    <input type="text" id="agent" placeholder="Agent name" />
+    <input type="text" id="msg" placeholder="Type your message" />
+    <button id="send">Send</button>
+
+    <script>
+        const socket = io();
+        const chat = document.getElementById('chat');
+        document.getElementById('send').addEventListener('click', () => {
+            const agent = document.getElementById('agent').value || 'Unknown';
+            const message = document.getElementById('msg').value;
+            if (message) {
+                socket.emit('agent_message', {agent, message});
+                document.getElementById('msg').value = '';
+            }
+        });
+
+        socket.on('message', (data) => {
+            const div = document.createElement('div');
+            div.classList.add('message');
+            div.innerHTML = `<span class="agent">${data.agent}:</span> ${data.message}`;
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
+        });
+    </script>
+</body>
+</html>
