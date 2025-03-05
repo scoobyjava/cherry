@@ -42,3 +42,83 @@
   "postCreateCommand": "npm install && pip install -r requirements.txt && pip install pylint pytest",
   "postStartCommand": "git config --global pull.rebase true"
 }
+
+# Cherry AI Project
+
+Cherry is an AI-powered development tool that helps streamline software engineering workflows using agent-based automation.
+
+## Development Environment
+
+This project uses GitHub Codespaces and VS Code Dev Containers for consistent development environments across all contributors.
+
+### Prerequisites
+
+- [Visual Studio Code](https://code.visualstudio.com/) with [Remote - Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension
+- [Docker](https://www.docker.com/products/docker-desktop) installed and running
+- Git
+
+### Quick Start
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/ai-cherry/cherry.git
+   cd cherry
+````
+
+```yaml
+name: Cherry CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest
+        npm install
+    - name: Run tests
+      run: |
+        pytest
+```
+
+# Contributing to Cherry AI
+
+[Contributing guidelines here]
+
+# Cherry AI Architecture
+
+[Architecture documentation here]
+
+# Bug Report
+
+name: Bug Report
+about: Create a report to help improve Cherry
+title: '[BUG] '
+labels: bug
+---
+
+**Describe the bug**
+[Description]
+
+**To Reproduce**
+[Steps]
+
+**Expected behavior**
+[Expectation]
