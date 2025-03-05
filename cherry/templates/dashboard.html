@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cherry Dashboard</title>
+    <style>
+        /* Simple styling for cards and leaderboard */
+        .card { border: 1px solid #ccc; padding: 10px; margin: 10px; display: inline-block; }
+        .leaderboard { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Cherry Task Dashboard</h1>
+    <div id="tasks"></div>
+    <div class="leaderboard">
+        <h2>Agent Leaderboard</h2>
+        <div id="leaderboard"></div>
+    </div>
+    <div id="announcement" style="margin-top: 20px; color: red;"></div>
+
+    <script>
+        async function fetchData(url) {
+            const response = await fetch(url);
+            return response.json();
+        }
+
+        async function renderDashboard() {
+            const tasks = await fetchData('/api/tasks');
+            const leaderboard = await fetchData('/api/leaderboard');
+
+            // Render task cards
+            const tasksDiv = document.getElementById('tasks');
+            tasksDiv.innerHTML = '';
+            tasks.forEach(task => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `<h3>${task.title}</h3><p>Status: ${task.status}</p>`;
+                tasksDiv.appendChild(card);
+            });
+
+            // Render leaderboard
+            const leaderboardDiv = document.getElementById('leaderboard');
+            leaderboardDiv.innerHTML = '';
+            leaderboard.forEach(entry => {
+                const entryDiv = document.createElement('div');
+                entryDiv.innerHTML = `<strong>${entry.agent}</strong> - Tasks: ${entry.tasks_completed}, Avg Time: ${entry.avg_time} hrs`;
+                leaderboardDiv.appendChild(entryDiv);
+            });
+        }
+
+        // Simulate fun event announcement
+        function announceStreak(message) {
+            document.getElementById('announcement').textContent = message;
+        }
+
+        // Example: trigger announcement if a streak is detected (replace with real detection)
+        function checkTaskStreak() {
+            // Dummy condition: if agent "Alice" has completed >= 3 tasks in a row without delegate delays
+            // In reality, this would be triggered by backend logic.
+            let streakDetected = true; // For demonstration
+            if (streakDetected) {
+                announceStreak("Cherry announces: Agent Alice just completed 3 tasks in a row without delegate delays!");
+            }
+        }
+
+        renderDashboard();
+        checkTaskStreak();
+    </script>
+</body>
+</html>

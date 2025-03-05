@@ -37,6 +37,7 @@ pytest tests/
 Cherry AI is an advanced, flexible multi-agent AI system designed to tackle complex problem-solving tasks through intelligent agent collaboration, creative ideation, and adaptive learning.
 
 ### 🚀 Key Features
+
 - Dynamic Multi-Agent Orchestration
 - Creative Problem-Solving Capabilities
 - Skill-Based Agent Architecture
@@ -46,30 +47,35 @@ Cherry AI is an advanced, flexible multi-agent AI system designed to tackle comp
 ## 🔧 Installation
 
 ### Prerequisites
+
 - Python 3.9+
 - OpenAI API Key
 
 ### Setup Steps
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/yourusername/cherry-ai.git
 cd cherry-ai
 ```
 
 2. Create a virtual environment:
+
 ```bash
 python3 -m venv venv
 source venv/bin/activate  # On Windows use `venv\Scripts\activate`
 ```
 
 3. Install dependencies:
+
 ```bash
 pip install -r requirements.txt
 ```
 
 4. Set up environment variables:
-Create a `.env` file in the project root:
+   Create a `.env` file in the project root:
+
 ```
 OPENAI_API_KEY=your_openai_api_key_here
 ```
@@ -77,16 +83,17 @@ OPENAI_API_KEY=your_openai_api_key_here
 ## Setup
 
 1. Install the required packages:
-    ```sh
-    pip install -r requirements.txt
-    ```
+
+   ```sh
+   pip install -r requirements.txt
+   ```
 
 2. Create a `.env` file in the root directory and add the following environment-specific settings:
-    ```plaintext
-    DEBUG=True
-    SECRET_KEY=your_secret_key
-    DATABASE_URL=sqlite:///your_database.db
-    ```
+   ```plaintext
+   DEBUG=True
+   SECRET_KEY=your_secret_key
+   DATABASE_URL=sqlite:///your_database.db
+   ```
 
 ## Secret Management
 
@@ -95,11 +102,13 @@ This project uses a secure approach to manage API keys and other sensitive infor
 ### Setup Instructions
 
 1. Copy the example environment file:
+
    ```bash
    cp .env.example .env
    ```
 
 2. Add your actual API keys to the `.env` file:
+
    ```
    OPENAI_API_KEY=sk-your-actual-key
    PINECONE_API_KEY=your-actual-pinecone-key
@@ -121,11 +130,13 @@ This project uses a secure approach to manage API keys and other sensitive infor
 ### Using Secrets in Configuration
 
 In configuration files, reference secrets using the syntax:
+
 ```
 ${SECRET:KEY_NAME:provider_type}
 ```
 
 Example:
+
 ```json
 {
   "api_key": "${SECRET:OPENAI_API_KEY:env_var}"
@@ -137,6 +148,7 @@ If provider_type is omitted, it will use the default provider (environment varia
 ## 🎬 Quick Start
 
 ### Basic Usage
+
 ```python
 from cherry.agents.creative_agent import CreativeAgent
 
@@ -157,6 +169,7 @@ print(result)
 ```
 
 ## 📂 Project Structure
+
 ```
 cherry_ai/
 │
@@ -183,6 +196,7 @@ cherry_ai/
 ## 🤝 Contributing
 
 ### How to Contribute
+
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
@@ -190,6 +204,7 @@ cherry_ai/
 5. Open a Pull Request
 
 ### Development Setup
+
 ```bash
 # Install development dependencies
 pip install -r requirements.txt
@@ -204,6 +219,7 @@ flake8 .
 ```
 
 ## 🧠 Roadmap
+
 - [ ] Expand Agent Skill Sets
 - [ ] Implement Advanced Memory Consolidation
 - [ ] Add More Specialized Agents
@@ -251,7 +267,7 @@ The refactoring approach takes advantage of:
 To generate a configuration:
 
 ```javascript
-const { generateBenchmarkConfig } = require('./config/config_generator');
+const { generateBenchmarkConfig } = require("./config/config_generator");
 
 const config = generateBenchmarkConfig(process.env);
 console.log(JSON.stringify(config, null, 2));
@@ -296,10 +312,7 @@ Example configuration:
     "cyclomaticComplexity": 10,
     "maintainabilityIndex": 65
   },
-  "ignorePatterns": [
-    "/node_modules/",
-    "\\.test\\."
-  ],
+  "ignorePatterns": ["/node_modules/", "\\.test\\."],
   "reportFormat": "detailed"
 }
 ```
@@ -307,9 +320,7 @@ Example configuration:
 ### Metrics Explained
 
 - **Cyclomatic Complexity (CC)**: Measures the number of linearly independent paths through the code. Higher values (>10) indicate code that may be difficult to test and maintain.
-  
 - **Maintainability Index (MI)**: A composite metric that considers cyclomatic complexity, lines of code, and Halstead volume. Values below 65 suggest code that might be difficult to maintain.
-  
 - **Halstead Difficulty**: Represents how difficult the code is to understand. Higher values indicate more complex code.
 
 - **Parameter Count**: The number of parameters in functions. Functions with many parameters (>4) may be doing too much.
@@ -355,31 +366,43 @@ You can configure the analyzer using command-line arguments or a JSON configurat
 - Warning threshold: 40 lines
 - Error threshold: 80 lines
 - Supported file extensions: .py, .js, .ts, .jsx, .tsx
-- Excluded directories: node_modules, venv, .git, __pycache__, dist, build
+- Excluded directories: node_modules, venv, .git, **pycache**, dist, build
 
 Example configuration file (analyzer_config.json):
+
 ```json
 {
   "warning_threshold": 40,
   "error_threshold": 80,
   "file_extensions": [".py", ".js", ".ts", ".jsx", ".tsx"],
-  "exclude_dirs": ["node_modules", "venv", ".git", "__pycache__", "dist", "build"],
+  "exclude_dirs": [
+    "node_modules",
+    "venv",
+    ".git",
+    "__pycache__",
+    "dist",
+    "build"
+  ],
   "exclude_files": ["generated_*.py", "*.min.js"]
 }
 ```
 
 ## 📜 License
+
 Distributed under the MIT License. See `LICENSE` for more information.
 
 ## 🚨 Disclaimer
+
 Cherry AI is an experimental project. Use with caution and always verify critical outputs.
 
 ## 📞 Contact
+
 - Project Lead: Lynn Patrick Musil
 - Email: Lynn@payready.com
 - Project Link: [https://github.com/yourusername/cherry-ai]
 
 ## 🌈 Inspiration
+
 Inspired by the potential of multi-agent AI systems to solve complex, interdisciplinary challenges.
 
 # Cherry - AI Orchestration Framework
@@ -391,11 +414,13 @@ Cherry requires several environment variables to be set for connecting to extern
 ### Setting Up Environment Variables
 
 1. Copy the example environment file:
+
    ```bash
    cp .env.example .env
    ```
 
 2. Edit the `.env` file and add your API keys and configuration:
+
    ```
    PINECONE_API_KEY=your_pinecone_api_key_here
    PINECONE_ENVIRONMENT=your_pinecone_environment_here
@@ -433,3 +458,51 @@ Cherry is a project that...
 git clone https://github.com/username/cherry.git
 cd cherry
 npm install
+```
+
+## SSH Access
+
+To grant external AI access to this repository, follow these steps:
+
+1. Ensure you have an SSH key pair. If not, generate one using:
+
+   ```sh
+   ssh-keygen -t rsa -b 4096 -C "your-email@example.com"
+   ```
+
+2. Add the public key to the repository's deploy keys. You can find the public key in `ssh/deploy_key.pub`.
+
+3. Configure the external AI system to use the corresponding private key for authentication.
+
+4. Use the SSH clone URL (e.g., `git@github.com:username/repository.git`) when interacting with the repository.
+
+# Cherry: AI Deployment and Testing Framework
+
+Cherry provides a comprehensive framework for testing, evaluating, and deploying AI systems in controlled environments with robust feedback mechanisms.
+
+## System Architecture
+
+Cherry consists of several integrated components:
+
+1. **Simulation Framework**: Creates fully sandboxed environments to test behavior without external dependencies.
+2. **Staging Deployment**: Tests interactions with (mock) real-world APIs and databases in a controlled setting.
+3. **Learning System**: Analyzes reports from simulations and staging to identify trends and suggest improvements.
+4. **Integration Layer**: Coordinates the workflow across all components.
+
+## Getting Started
+
+### Prerequisites
+
+- Python 3.8+
+- Dependencies in `requirements.txt`
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/ai-cherry/cherry.git
+cd cherry
+
+# Install dependencies
+pip install -r requirements.txt
+```

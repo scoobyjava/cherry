@@ -1,3 +1,6 @@
+from cherry.agents.base_agent import Agent
+from datetime import datetime
+from typing import Dict, Any, List, Optional
 import asyncio
 import json
 import time
@@ -28,16 +31,18 @@ from .exceptions import (
 )
 from .recovery import RecoveryManager, RetryStrategy, FallbackAgentStrategy
 from .errors import (
-    CherryError, AgentError, AgentTimeoutError, OrchestratorError, 
+    CherryError, AgentError, AgentTimeoutError, OrchestratorError,
     MemoryError, ConfigurationError
 )
 from .monitoring import ErrorMonitor
 from .recovery import retry, ErrorRecoveryHandler, ExponentialBackoff, ConstantRetry
 
+
 @dataclass
 class TaskDependency:
     prerequisite_ids: List[int] = field(default_factory=list)
     blocking_conditions: List[Dict[str, Any]] = field(default_factory=list)
+
 
 @dataclass
 class TaskMetrics:
@@ -47,8 +52,10 @@ class TaskMetrics:
     last_execution_time: float = 0.0
     total_processing_time: float = 0.0
 
+
 class TaskOrchestrationError(Exception):
     pass
+
 
 class AdvancedOrchestrator:
     def __init__(self, config_path: str = 'config.json'):
@@ -82,7 +89,8 @@ class AdvancedOrchestrator:
     def _init_memory_system(self):
         """Initialize the memory system using ChromaMemory."""
         try:
-            self.primary_memory = ChromaMemory(collection_name="cherry_primary_memory")
+            self.primary_memory = ChromaMemory(
+                collection_name="cherry_primary_memory")
             logger.info("Memory initialized successfully.")
         except Exception as e:
             logger.error(f"Memory initialization failed: {e}")
@@ -115,7 +123,8 @@ class AdvancedOrchestrator:
 
         def visit(task):
             if task in stack:
-                logging.error(f"Cycle detected: {task} is in the stack {stack}")
+                logging.error(
+                    f"Cycle detected: {task} is in the stack {stack}")
                 raise Exception("Task dependency cycle detected")
             if task not in visited:
                 logging.debug(f"Visiting task {task}")
@@ -175,7 +184,8 @@ class AdvancedOrchestrator:
         while self.running:
             with self.lock:
                 if self.task_queue:
-                    task = self.task_queue.pop(0)  # Process tasks in FIFO order
+                    # Process tasks in FIFO order
+                    task = self.task_queue.pop(0)
                 else:
                     task = None
             if task:
@@ -212,663 +222,253 @@ class AdvancedOrchestrator:
         logging.debug(f"Task {task} completed")
         self.completed_tasks.append(task)
 
+
 class MemoryInterface(ABC):
     @abstractmethod
     def store(self, key: str, data: Dict[str, Any], namespace: Optional[str] = None) -> str:
         """Store data in memory with optional namespace."""
         pass
-    
+
     @abstractmethod
     def retrieve(self, query: str, namespace: Optional[str] = None, limit: int = 5) -> List[Dict[str, Any]]:
         """Retrieve relevant memory entries based on semantic search."""
         pass
-    
+
     @abstractmethod
     def update(self, key: str, data: Dict[str, Any], namespace: Optional[str] = None) -> bool:
         """Update an existing memory entry."""
         pass
-    
+
     @abstractmethod
     def delete(self, key: str, namespace: Optional[str] = None) -> bool:
         """Remove a memory entry."""
         pass
 
+
+logger = logging.getLogger(__name__)
+
+
 class Orchestrator:
     """
-    Orchestrates agent execution with robust error handling and recovery.
+    Central coordinator for Cherry's agent ecosystem.
+    Manages agent interactions, workflows, and maintains system state.
     """
-    
-    def __init__(self, default_agent_type: str = "default", config: Optional[Dict[str, Any]] = None):
-        """
-        Initialize the Orchestrator.
-        
-        Args:
-            default_agent_type: The default agent to use when no specific agent is matched
-            config: Configuration dictionary
-        """
-        self.agent_registry = {}
-        self.capabilities = {}
-        self.workflows = {}  # Initialize workflows dictionary
-        self.default_agent_type = default_agent_type
-        self.logger = logging.getLogger(__name__)
-        self.recovery_manager = RecoveryManager()
-        self._setup_recovery_strategies()
-        
-        # Add error handling components
-        self.config = config or {}
-        self.agents = {}  # Map of agent_id to agent instance
-        
-        # Initialize error handling components
-        self.error_recovery = ErrorRecoveryHandler(
-            fallback_agents=self.config.get('fallback_agents', {})
-        )
-        self.error_monitor = ErrorMonitor()
-        
-        # Configure error thresholds
-        self._configure_error_monitoring()
-        
-        # Initialize memory system
-        self.memory_manager = None
-        self._init_memory_system()
-        
-    def _init_memory_system(self):
-        """Initialize the memory system if configured."""
-        try:
-            # Only initialize if memory configuration is provided
-            if 'memory' in self.config:
-                from cherry.memory import MemoryManager
-                self.memory_manager = MemoryManager()
-                self.logger.info("Memory system initialized")
-        except ImportError:
-            self.logger.warning("Memory system not available")
-    
-    def _configure_error_monitoring(self) -> None:
-        """Configure error monitoring thresholds."""
-        # Set default thresholds
-        self.error_monitor.set_threshold("AgentTimeoutError", 5)
-        self.error_monitor.set_threshold("AgentExecutionError", 10)
-        
-        # Apply custom thresholds from config if any
-        custom_thresholds = self.config.get('error_thresholds', {})
-        for error_type, threshold in custom_thresholds.items():
-            self.error_monitor.set_threshold(error_type, threshold)
-            
-    def _setup_recovery_strategies(self):
-        """Set up default recovery strategies."""
-        # Default retry strategy for most agent exceptions
-        self.recovery_manager.register_strategy(
-            AgentException, 
-            RetryStrategy(max_retries=3, delay=2.0)
-        )
-        
-        # The default strategy for any unhandled exception
-        self.recovery_manager.set_default_strategy(
-            RetryStrategy(max_retries=1, delay=1.0)
-        )
-    
-    def register_agent(self, agent_id: str, agent: Any, agent_type: Optional[str] = None, 
-                      capabilities: Optional[List[str]] = None) -> None:
-        """
-        Register an agent with the orchestrator.
-        
-        Args:
-            agent_id: Unique identifier for the agent
-            agent: Agent instance
-            agent_type: Type of agent for fallback purposes
-            capabilities: List of capabilities this agent has
-        """
-        try:
-            if agent_id in self.agents:
-                raise OrchestratorError(f"Agent with ID {agent_id} is already registered")
-            
-            # Register in agents dict for error handling
-            self.agents[agent_id] = {
-                'instance': agent,
-                'type': agent_type,
-                'status': 'idle',
-                'last_error': None
-            }
-            
-            # Register in agent_registry for task routing
-            self.agent_registry[agent_id] = agent
-            if capabilities:
-                self.capabilities[agent_id] = capabilities
-                
-            self.logger.info(f"Agent {agent_id} registered successfully")
-        except Exception as e:
-            error_msg = f"Failed to register agent {agent_id}: {str(e)}"
-            self.logger.error(error_msg)
-            self.error_monitor.record_error("RegistrationError", error_msg)
-            raise OrchestratorError(error_msg) from e
-    
-    @retry(max_attempts=3, retry_strategy=ExponentialBackoff(initial_delay=1.0))
-    def execute_agent(self, agent_id: str, task: Any, timeout: float = 60.0) -> Any:
-        """
-        Execute a task with the specified agent, with error handling and timeout.
-        
-        Args:
-            agent_id: ID of the agent to execute the task
-            task: The task to execute
-            timeout: Maximum execution time in seconds
-            
-        Returns:
-            Result from the agent
-            
-        Raises:
-            AgentError: If agent execution fails
-            OrchestratorError: If agent is not registered
-        """
-        if agent_id not in self.agents:
-            error_msg = f"Agent {agent_id} not registered"
-            self.error_monitor.record_error("OrchestratorError", error_msg)
-            raise OrchestratorError(error_msg)
-        
-        agent_info = self.agents[agent_id]
-        agent = agent_info['instance']
-        agent_info['status'] = 'busy'
-        
-        try:
-            start_time = time.time()
-            # Implement timeout mechanism
-            # This is a simplified version - in a real implementation,
-            # you might use threading or async mechanisms for proper timeouts
-            result = agent.execute(task)  # Assume agent has an execute method
-            
-            execution_time = time.time() - start_time
-            if execution_time > timeout:
-                error_msg = f"Agent {agent_id} execution exceeded timeout of {timeout}s"
-                self.error_monitor.record_error("AgentTimeoutError", error_msg)
-                raise AgentTimeoutError(
-                    message=error_msg,
-                    timeout_seconds=timeout,
-                    agent_id=agent_id,
-                    agent_type=agent_info['type']
-                )
-            
-            logger.debug(f"Agent {agent_id} completed task in {execution_time:.2f}s")
-            return result
-            
-        except AgentError:
-            # Re-raise agent errors directly
-            raise
-        except Exception as e:
-            error_msg = f"Agent {agent_id} execution failed: {str(e)}"
-            logger.error(f"{error_msg}\n{traceback.format_exc()}")
-            self.error_monitor.record_error(
-                "AgentExecutionError", 
-                error_msg,
-                {'agent_id': agent_id, 'agent_type': agent_info['type']}
-            )
-            
-            # Create and raise a proper AgentExecutionError
-            raise AgentExecutionError(
-                message=error_msg,
-                agent_id=agent_id,
-                agent_type=agent_info['type'],
-                original_exception=e
-            ) from e
-        finally:
-            agent_info['status'] = 'idle'
-    
-    def execute_with_fallback(self, primary_agent_id: str, task: Any, timeout: float = 60.0) -> Any:
-        """
-        Execute a task with the primary agent, falling back to alternatives if it fails.
-        
-        Args:
-            primary_agent_id: ID of the primary agent to use
-            task: The task to execute
-            timeout: Maximum execution time in seconds
-            
-        Returns:
-            Result from successful agent execution
-        """
-        try:
-            return self.execute_agent(primary_agent_id, task, timeout)
-        except AgentError as e:
-            logger.warning(f"Primary agent {primary_agent_id} failed, attempting recovery")
-            try:
-                return self.error_recovery.handle_agent_error(e, self)
-            except Exception as recovery_error:
-                logger.error(f"Recovery failed: {str(recovery_error)}")
-                # Re-raise the original error if recovery fails
-                raise e
-    
-    def execute_with_agent_type(self, agent_type: str, task: Any = None) -> Any:
-        """
-        Execute a task with the first available agent of the specified type.
-        
-        Args:
-            agent_type: Type of agent to use
-            task: The task to execute
-            
-        Returns:
-            Result from agent execution
-            
-        Raises:
-            OrchestratorError: If no agent of the specified type is available
-        """
-        # Find agents of the specified type
-        matching_agents = [
-            agent_id for agent_id, info in self.agents.items() 
-            if info['type'] == agent_type and info['status'] == 'idle'
+
+    def __init__(self):
+        self.agents: Dict[str, Agent] = {}
+        self.task_queue = asyncio.Queue()
+        self.task_history: List[Dict[str, Any]] = []
+        self.approval_queue: List[Dict[str, Any]] = []
+        self.is_running = False
+        self.max_concurrent_tasks = 3
+
+    def register_agent(self, agent: Agent) -> None:
+        """Register an agent with the orchestrator."""
+        self.agents[agent.name] = agent
+        logger.info(f"Registered agent: {agent.name}")
+
+    async def start(self) -> None:
+        """Start the orchestrator and begin processing tasks."""
+        self.is_running = True
+        logger.info("Cherry orchestrator started")
+
+        # Start task consumer workers
+        consumers = [
+            asyncio.create_task(self._task_consumer())
+            for _ in range(self.max_concurrent_tasks)
         ]
-        
-        if not matching_agents:
-            error_msg = f"No available agents of type {agent_type}"
-            self.error_monitor.record_error("OrchestratorError", error_msg)
-            raise OrchestratorError(error_msg)
-        
-        # Use the first available agent
-        return self.execute_agent(matching_agents[0], task)
-    
-    def get_health_status(self) -> Dict[str, Any]:
+
+        # Wait for all consumers to complete (won't happen unless stop() is called)
+        await asyncio.gather(*consumers)
+
+    async def stop(self) -> None:
+        """Stop the orchestrator gracefully."""
+        self.is_running = False
+        logger.info("Cherry orchestrator stopping")
+
+        # Add termination signals to the queue
+        for _ in range(self.max_concurrent_tasks):
+            await self.task_queue.put(None)
+
+    async def submit_task(self, task_type: str, task_data: Dict[str, Any]) -> str:
         """
-        Get the health status of the orchestrator and its agents.
-        
+        Submit a new task to be processed by the appropriate agent.
+
+        Args:
+            task_type: Type of task to be performed
+            task_data: Data required for the task
+
         Returns:
-            Dictionary with health status information
+            task_id: Unique identifier for tracking the task
         """
-        agent_status = {
-            agent_id: {
-                'status': info['status'],
-                'type': info['type'],
-                'last_error': info.get('last_error')
-            }
-            for agent_id, info in self.agents.items()
+        task_id = f"task_{datetime.now().strftime('%Y%m%d%H%M%S')}_{len(self.task_history)}"
+        task = {
+            "task_id": task_id,
+            "task_type": task_type,
+            "task_data": task_data,
+            "status": "pending",
+            "submitted_at": datetime.now().isoformat(),
+            "requires_approval": task_data.get("requires_approval", False),
         }
-        
-        error_summary = self.error_monitor.get_error_summary()
-        
-        return {
-            'status': 'healthy' if error_summary['total_errors'] < 5 else 'degraded',
-            'agent_count': len(self.agents),
-            'agents': agent_status,
-            'errors': error_summary
-        }
-    
-    def shutdown(self) -> None:
+
+        self.task_history.append(task)
+        await self.task_queue.put(task)
+
+        logger.info(f"Submitted task {task_id} of type {task_type}")
+        return task_id
+
+    async def get_task_status(self, task_id: str) -> Dict[str, Any]:
+        """Get the current status of a task."""
+        for task in self.task_history:
+            if task["task_id"] == task_id:
+                return task
+        return {"error": f"Task {task_id} not found"}
+
+    async def get_pending_approvals(self) -> List[Dict[str, Any]]:
+        """Get list of changes waiting for user approval."""
+        return self.approval_queue
+
+    async def approve_change(self, task_id: str, approved: bool, feedback: str = "") -> Dict[str, Any]:
         """
-        Shutdown the orchestrator gracefully.
-        """
-        self.logger.info("Shutting down orchestrator")
-        # Export error logs before shutdown
-        try:
-            self.error_monitor.export_errors("orchestrator_errors.json")
-        except Exception as e:
-            self.logger.error(f"Failed to export error logs: {str(e)}")
-        
-        # Perform any necessary cleanup
-        for agent_id, info in self.agents.items():
-            try:
-                # Assuming agents have a shutdown method
-                if hasattr(info['instance'], 'shutdown'):
-                    info['instance'].shutdown()
-            except Exception as e:
-                self.logger.error(f"Failed to shutdown agent {agent_id}: {str(e)}")
-        
-        self.logger.info("Orchestrator shutdown complete")
-    
-    def analyze_task(self, task: str) -> str:
-        """
-        Analyze the incoming task to determine which agent is best suited.
-        
+        Approve or reject a proposed change.
+
         Args:
-            task: The task to analyze
-            
+            task_id: ID of the task to approve
+            approved: Whether the change is approved
+            feedback: Optional feedback about the decision
+
         Returns:
-            The type of agent best suited for this task
+            Updated task information
         """
-        task_lower = task.lower()
-        
-        # Check each agent's capabilities against the task
-        agent_scores = {}
-        
-        for agent_type, capability_list in self.capabilities.items():
-            score = 0
-            for capability in capability_list:
-                if capability.lower() in task_lower:
-                    score += 1
-            agent_scores[agent_type] = score
-        
-        # Find the agent with the highest score
-        if agent_scores:
-            best_agent = max(agent_scores.items(), key=lambda x: x[1])
-            if best_agent[1] > 0:  # If at least one capability matched
-                return best_agent[0]
-        
-        # Fall back to keyword matching
-        if "research" in task_lower or "information" in task_lower or "find" in task_lower:
-            return "researcher" if "researcher" in self.agent_registry else self.default_agent_type
-        elif "code" in task_lower or "programming" in task_lower or "develop" in task_lower:
-            return "developer" if "developer" in self.agent_registry else self.default_agent_type
-        elif "summarize" in task_lower or "write" in task_lower:
-            return "writer" if "writer" in self.agent_registry else self.default_agent_type
-        else:
-            return self.default_agent_type
-            
-    def route_task(self, task: str, **kwargs) -> Any:
-        """
-        Route the task to the appropriate agent.
-        
-        Args:
-            task: The task to route
-            **kwargs: Additional arguments to pass to the agent
-            
-        Returns:
-            The result from the agent processing the task
-        
-        Raises:
-            ValueError: If no suitable agent is available
-        """
-        agent_type = self.analyze_task(task)
-        self.logger.info(f"Routing task to agent: {agent_type}")
-        
-        if agent_type in self.agent_registry:
-            agent = self.agent_registry[agent_type]
-            return agent.process_task(task, **kwargs)
-        else:
-            error_msg = f"No agent available for task type: {agent_type}"
-            self.logger.error(error_msg)
-            raise ValueError(error_msg)
-    
-    def list_agents(self) -> List[str]:
-        """
-        List all registered agents.
-        
-        Returns:
-            Names of registered agents
-        """
-        return list(self.agent_registry.keys())
-        
-    def get_agent(self, agent_type: str):
-        """
-        Get a specific agent by type.
-        
-        Args:
-            agent_type: The type of agent to retrieve
-            
-        Returns:
-            The agent instance or None if not found
-        """
-        return self.agent_registry.get(agent_type)
-    
-    def create_fallback_agent(self, failed_agent_id: str, context: Dict[str, Any]):
-        """
-        Create a fallback agent when primary agent fails.
-        
-        Args:
-            failed_agent_id: ID of the failed agent
-            context: Context with information about the failure
-            
-        Returns:
-            A fallback agent instance or None if creation fails
-        """
-        try:
-            # This would be implemented based on your agent factory pattern
-            # For example:
-            agent_class = context.get('agent_class')
-            if agent_class:
-                fallback_config = {
-                    'is_fallback': True,
-                    'original_agent_id': failed_agent_id,
-                    # Simplified configuration that might help the agent succeed
-                    'timeout': context.get('timeout', 30) * 2,  # Double timeout
-                }
-                
-                fallback_agent = agent_class(f"{failed_agent_id}_fallback", **fallback_config)
-                self.register_agent(f"{failed_agent_id}_fallback", fallback_agent)
-                return fallback_agent
-        except Exception as e:
-            logger.error(f"Failed to create fallback agent for {failed_agent_id}: {str(e)}")
-        
-        return None
-    
-    def register_fallback_strategy(self, error_type: type) -> None:
-        """
-        Register a fallback agent strategy for a specific error type.
-        
-        Args:
-            error_type: The error type to handle with fallback agents
-        """
-        self.recovery_manager.register_strategy(
-            error_type,
-            FallbackAgentStrategy(self.create_fallback_agent)
-        )
-    
-    def register_workflow(self, workflow_id: str, workflow_steps: List[Dict[str, Any]]) -> None:
-        """
-        Register a workflow with the orchestrator.
-        
-        Args:
-            workflow_id: Unique identifier for the workflow
-            workflow_steps: List of steps defining the workflow
-            
-        Raises:
-            OrchestratorException: If workflow registration fails
-        """
-        try:
-            if workflow_id in self.workflows:
-                logger.warning(f"Workflow {workflow_id} is already registered, replacing")
-            
-            self.workflows[workflow_id] = workflow_steps
-            logger.info(f"Workflow {workflow_id} registered successfully with {len(workflow_steps)} steps")
-        except Exception as e:
-            error_msg = f"Failed to register workflow {workflow_id}: {str(e)}"
-            logger.error(error_msg)
-            raise OrchestratorException(error_msg)
-    
-    def execute_agent_task(self, agent_id: str, task: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Execute a task with an agent and handle potential failures.
-        
-        Args:
-            agent_id: ID of the agent to use
-            task: Task definition to execute
-            
-        Returns:
-            Dict with task results or error information
-            
-        Raises:
-            AgentExecutionError: If execution fails and cannot be recovered
-        """
-        if agent_id not in self.agent_registry:
-            raise AgentInitializationError(agent_id, "Agent not registered")
-        
-        agent = self.agent_registry[agent_id]
-        
-        try:
-            logger.info(f"Executing task with agent {agent_id}: {task.get('type', 'unknown')}")
-            result = agent.execute_task(task)
-            logger.info(f"Agent {agent_id} completed task successfully")
-            return result
-        except Exception as e:
-            logger.error(f"Agent {agent_id} failed to execute task: {str(e)}")
-            
-            # Create recovery context
-            context = {
-                'operation': agent.execute_task,
-                'args': [task],
-                'kwargs': {},
-                'task': task,
-                'agent_class': agent.__class__,
-                'error': e
-            }
-            
-            # Attempt recovery
-            if self.recovery_manager.attempt_recovery(agent_id, e, context):
-                logger.info(f"Successfully recovered from failure for agent {agent_id}")
-                return {"status": "recovered", "message": "Task completed after recovery"}
-            else:
-                error_details = f"Failed to execute task: {str(e)}"
-                logger.error(f"Recovery failed for agent {agent_id}: {error_details}")
-                error_traceback = traceback.format_exc()
-                raise AgentExecutionError(agent_id, task=task.get('type', 'unknown'), details=str(e))
-    
-    def execute_workflow(self, workflow_id: str, context: Dict[str, Any] = None) -> Dict[str, Any]:
-        """
-        Execute a complete workflow with error handling and recovery.
-        
-        Args:
-            workflow_id: ID of the workflow to execute
-            context: Additional context for workflow execution
-            
-        Returns:
-            Dict with workflow results or error information
-            
-        Raises:
-            WorkflowException: If workflow execution fails
-        """
-        if workflow_id not in self.workflows:
-            raise WorkflowException(f"Workflow {workflow_id} not found")
-        
-        workflow_steps = self.workflows[workflow_id]
-        results = []
-        context = context or {}
-        
-        try:
-            for i, step in enumerate(workflow_steps):
-                logger.info(f"Executing workflow {workflow_id} step {i+1}/{len(workflow_steps)}")
-                
-                agent_id = step.get('agent_id')
-                if not agent_id:
-                    raise WorkflowException(f"Missing agent_id in workflow step {i+1}")
-                
-                task = step.get('task', {})
-                
-                # Add workflow context to task
-                task['workflow_context'] = context
-                task['workflow_id'] = workflow_id
-                task['step_index'] = i
-                
-                try:
-                    step_result = self.execute_agent_task(agent_id, task)
-                    results.append(step_result)
-                    
-                    # Update context with step results for subsequent steps
-                    context.update({
-                        f"step_{i}_result": step_result,
-                        "last_step_result": step_result
-                    })
-                    
-                    # Check if we need to stop workflow based on step result
-                    if step.get('stop_on_condition') and self._evaluate_condition(
-                        step['stop_on_condition'], step_result, context
-                    ):
-                        logger.info(f"Workflow {workflow_id} stopped at step {i+1} due to condition")
+        # Find the task in the approval queue
+        for i, task in enumerate(self.approval_queue):
+            if task["task_id"] == task_id:
+                # Update task status
+                task["status"] = "approved" if approved else "rejected"
+                task["feedback"] = feedback
+                task["decision_time"] = datetime.now().isoformat()
+
+                # If approved, process the change
+                if approved:
+                    await self._process_approved_change(task)
+
+                # Remove from approval queue
+                self.approval_queue.pop(i)
+
+                # Update task in history
+                for hist_task in self.task_history:
+                    if hist_task["task_id"] == task_id:
+                        hist_task.update(task)
                         break
-                        
-                except AgentException as e:
-                    logger.error(f"Agent failure in workflow {workflow_id} step {i+1}: {str(e)}")
-                    
-                    # Check if we can continue despite this error
-                    if not step.get('continue_on_error', False):
-                        raise WorkflowException(
-                            f"Workflow {workflow_id} failed at step {i+1}: {str(e)}"
-                        )
-                    
-                    logger.warning(f"Continuing workflow despite error in step {i+1}")
-                    results.append({"status": "error", "message": str(e)})
-                    
-            return {
-                "workflow_id": workflow_id,
-                "status": "completed",
-                "results": results,
-                "context": context
-            }
-            
-        except Exception as e:
-            error_msg = f"Workflow {workflow_id} execution failed: {str(e)}"
-            logger.error(error_msg)
-            logger.debug(traceback.format_exc())
-            
-            return {
-                "workflow_id": workflow_id,
-                "status": "failed",
-                "error": str(e),
-                "partial_results": results,
-                "context": context
-            }
-    
-    def _evaluate_condition(self, condition: str, result: Dict[str, Any], context: Dict[str, Any]) -> bool:
-        """
-        Evaluate a condition based on step result and context.
-        
-        Args:
-            condition: String condition to evaluate
-            result: Step result
-            context: Current workflow context
-            
-        Returns:
-            Boolean indicating if condition is met
-        """
-        try:
-            # This is a simplified implementation
-            # In a real implementation, you would want to use a safer
-            # evaluation approach than eval()
-            
-            # Create a safe dictionary of variables for evaluation
-            eval_locals = {
-                "result": result,
-                "context": context,
-                "status": result.get("status"),
-                "has_error": "error" in result or result.get("status") == "error",
-            }
-            
-            return eval(condition, {"__builtins__": {}}, eval_locals)
-        except Exception as e:
-            self.logger.error(f"Error evaluating condition '{condition}': {str(e)}")
-            return False
-            
-    def shutdown(self) -> None:
-        """
-        Shutdown the orchestrator gracefully.
-        """
-        self.logger.info("Shutting down orchestrator")
-        # Export error logs before shutdown
-        try:
-            self.error_monitor.export_errors("orchestrator_errors.json")
-        except Exception as e:
-            self.logger.error(f"Failed to export error logs: {str(e)}")
-        
-        # Perform any necessary cleanup
-        for agent_id, info in self.agents.items():
+
+                return task
+
+        return {"error": f"Task {task_id} not found in approval queue"}
+
+    async def _task_consumer(self) -> None:
+        """Background worker that processes tasks from the queue."""
+        while self.is_running:
+            task = await self.task_queue.get()
+
+            # Check for termination signal
+            if task is None:
+                self.task_queue.task_done()
+                break
+
             try:
-                # Assuming agents have a shutdown method
-                if hasattr(info['instance'], 'shutdown'):
-                    info['instance'].shutdown()
+                # Update task status
+                task["status"] = "processing"
+                task["started_at"] = datetime.now().isoformat()
+
+                # Determine the appropriate agent
+                agent = self._select_agent_for_task(task)
+                if not agent:
+                    task["status"] = "failed"
+                    task["error"] = "No suitable agent found for this task"
+                    continue
+
+                # Process the task
+                result = await agent.process(task["task_data"])
+
+                # Check if this requires approval
+                if task["requires_approval"]:
+                    task["status"] = "awaiting_approval"
+                    task["result"] = result
+                    self.approval_queue.append(task)
+                else:
+                    task["status"] = "completed"
+                    task["result"] = result
+
+                task["completed_at"] = datetime.now().isoformat()
+
             except Exception as e:
-                self.logger.error(f"Failed to shutdown agent {agent_id}: {str(e)}")
-        
-        self.logger.info("Orchestrator shutdown complete")
-    
-    def load_agent(self, agent_module: str, agent_class: str, agent_type: str = None, **kwargs):
-        """
-        Dynamically load and register an agent.
-        
-        Args:
-            agent_module: The module path to the agent
-            agent_class: The agent class name
-            agent_type: The type name to register (defaults to agent_class)
-            **kwargs: Arguments to pass to the agent constructor
-        
-        Returns:
-            The agent instance
-        """
-        if agent_type is None:
-            agent_type = agent_class
-            
+                logger.error(f"Error processing task {task['task_id']}: {e}")
+                task["status"] = "failed"
+                task["error"] = str(e)
+            finally:
+                self.task_queue.task_done()
+
+                # Update task in history
+                for i, hist_task in enumerate(self.task_history):
+                    if hist_task["task_id"] == task["task_id"]:
+                        self.task_history[i] = task
+                        break
+
+    def _select_agent_for_task(self, task: Dict[str, Any]) -> Optional[Agent]:
+        """Select the most appropriate agent for a given task."""
+        task_type = task["task_type"]
+
+        # Map task types to agent capabilities
+        if task_type in ["planning", "breakdown", "estimation", "roadmap"]:
+            for name, agent in self.agents.items():
+                if "planning" in agent.capabilities:
+                    return agent
+        elif task_type in ["code_generation", "code_modification", "refactoring"]:
+            for name, agent in self.agents.items():
+                if "coding" in agent.capabilities:
+                    return agent
+        elif task_type in ["explain", "document", "summarize"]:
+            for name, agent in self.agents.items():
+                if "documentation" in agent.capabilities:
+                    return agent
+
+        # Default to the first agent that matches any capability
+        for capability in task.get("task_data", {}).get("capabilities", []):
+            for name, agent in self.agents.items():
+                if capability in agent.capabilities:
+                    return agent
+
+        return None
+
+    async def _process_approved_change(self, task: Dict[str, Any]) -> None:
+        """Process a change that has been approved."""
         try:
-            module = importlib.import_module(agent_module)
-            agent_cls = getattr(module, agent_class)
-            agent_instance = agent_cls(**kwargs)
-            
-            # Extract capabilities if the agent has a get_capabilities method
-            capabilities = None
-            if hasattr(agent_instance, 'get_capabilities'):
-                capabilities = agent_instance.get_capabilities()
-                
-            self.register_agent(agent_type, agent_instance, capabilities)
-            return agent_instance
-        except (ImportError, AttributeError) as e:
-            self.logger.error(f"Failed to load agent {agent_class} from {agent_module}: {e}")
-            return None
+            # Get the relevant coding agent
+            coding_agent = None
+            for name, agent in self.agents.items():
+                if "coding" in agent.capabilities:
+                    coding_agent = agent
+                    break
+
+            if not coding_agent:
+                logger.error(
+                    f"Cannot process approved change: no coding agent available")
+                return
+
+            # Prepare task data for implementation
+            implementation_data = {
+                "operation": "implement_approved_changes",
+                "changes": task["result"]["changes"],
+                "files": task["result"].get("files", []),
+                "approved": True,
+                "task_id": task["task_id"]
+            }
+
+            # Process the implementation
+            result = await coding_agent.process(implementation_data)
+            task["implementation_result"] = result
+
+        except Exception as e:
+            logger.error(
+                f"Error implementing approved change {task['task_id']}: {e}")
+            task["implementation_error"] = str(e)
