@@ -1,0 +1,71 @@
+{
+  "error_codes": {
+    "service_errors": {
+      "pinecone": {
+        "connection_failure": "PCN-E001",
+        "query_timeout": "PCN-E002",
+        "namespace_not_found": "PCN-E003",
+        "authentication_error": "PCN-E004"
+      },
+      "postgres": {
+        "connection_failure": "PG-E001",
+        "query_timeout": "PG-E002",
+        "schema_error": "PG-E003",
+        "authentication_error": "PG-E004"
+      },
+      "openai": {
+        "api_error": "OAI-E001",
+        "rate_limit_exceeded": "OAI-E002",
+        "context_length_exceeded": "OAI-E003",
+        "authentication_error": "OAI-E004"
+      }
+    },
+    "application_errors": {
+      "validation": "APP-E001",
+      "configuration": "APP-E002",
+      "resource_not_found": "APP-E003",
+      "permission_denied": "APP-E004"
+    }
+  },
+  "retry_policies": {
+    "default": {
+      "max_attempts": 3,
+      "initial_backoff_ms": 100,
+      "max_backoff_ms": 1000,
+      "backoff_multiplier": 2.0,
+      "retry_on_status_codes": [408, 429, 500, 502, 503, 504]
+    },
+    "pinecone": {
+      "max_attempts": 5,
+      "initial_backoff_ms": 200,
+      "max_backoff_ms": 2000,
+      "backoff_multiplier": 1.5,
+      "retry_on_status_codes": [429, 500, 503]
+    },
+    "postgres": {
+      "max_attempts": 3,
+      "initial_backoff_ms": 100,
+      "max_backoff_ms": 1000,
+      "backoff_multiplier": 2.0,
+      "retry_on_status_codes": [40001, 40P01, 57P01]
+    },
+    "openai": {
+      "max_attempts": 4,
+      "initial_backoff_ms": 500,
+      "max_backoff_ms": 8000,
+      "backoff_multiplier": 2.0,
+      "retry_on_status_codes": [429, 500, 502, 503]
+    }
+  },
+  "logging": {
+    "error_levels": {
+      "critical": 1,
+      "error": 2,
+      "warning": 3,
+      "info": 4,
+      "debug": 5
+    },
+    "includeStackTrace": true,
+    "includeMetadata": true
+  }
+}

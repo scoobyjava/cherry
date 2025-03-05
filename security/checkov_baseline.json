@@ -1,0 +1,10 @@
+{
+  "failed_checks": [],
+  "timestamp": "2023-09-15T10:00:00Z",
+  "check_type": "all",
+  "results": {
+    "failed_checks": [],
+    "passed_checks": [],
+    "skipped_checks": []
+  }
+}

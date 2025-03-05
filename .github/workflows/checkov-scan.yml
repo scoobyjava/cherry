@@ -1,0 +1,56 @@
+name: IaC Security Scan with Checkov
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - '**/*.tf'
+      - '**/*.yaml'
+      - '**/*.yml'
+      - '**/Dockerfile'
+      - '**/Chart.yaml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - '**/*.tf'
+      - '**/*.yaml'
+      - '**/*.yml'
+      - '**/Dockerfile'
+      - '**/Chart.yaml'
+  workflow_dispatch:
+
+jobs:
+  scan:
+    name: Checkov IaC Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Run Checkov scan
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: .
+          framework: all
+          output_format: cli,sarif
+          output_file: reports/checkov/results.sarif
+          skip_check: ${{ fromJson(secrets.CHECKOV_SKIP_CHECKS || '[]') }}
+          quiet: false
+          soft_fail: true
+          download_external_modules: true
+      
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: reports/checkov/results.sarif
+          category: checkov
+      
+      - name: Store Checkov results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: checkov-results
+          path: reports/checkov
+          retention-days: 90

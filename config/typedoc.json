@@ -1,0 +1,35 @@
+{
+  "entryPoints": [
+    "../src/interfaces",
+    "../src/api"
+  ],
+  "out": "../docs/api-reference",
+  "name": "Cherry API Reference",
+  "theme": "default",
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "excludeExternals": true,
+  "excludeInternal": true,
+  "plugin": [
+    "typedoc-plugin-markdown",
+    "typedoc-plugin-merge-modules"
+  ],
+  "readme": "../docs/api-documentation-standards.md",
+  "categorizeByGroup": true,
+  "categoryOrder": [
+    "API Interfaces",
+    "Vector Operations",
+    "Benchmark Operations",
+    "*"
+  ],
+  "sort": [
+    "alphabetical",
+    "visibility"
+  ],
+  "validation": {
+    "invalidLink": true,
+    "notExported": true
+  },
+  "searchInComments": true,
+  "jsDocCompatibility": true
+}

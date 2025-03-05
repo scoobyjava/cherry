@@ -1,0 +1,199 @@
+openapi: 3.0.3
+info:
+  title: Cherry Benchmarking API
+  description: API for managing and executing benchmarks across various agent types and services
+  version: 1.0.0
+  contact:
+    name: Cherry Team
+  license:
+    name: MIT
+servers:
+  - url: http://localhost:3000/api
+    description: Local development server
+  - url: https://api.cherry-benchmark.dev/api
+    description: Development environment
+paths:
+  /vectors/{namespace}:
+    get:
+      summary: Query vectors from a specific namespace
+      description: Retrieves vector embeddings that match query parameters from the specified namespace
+      operationId: getVectors
+      parameters:
+        - name: namespace
+          in: path
+          description: The vector namespace to query
+          required: true
+          schema:
+            type: string
+            enum: [search_agent, recommendation_agent, qa_agent]
+        - name: topK
+          in: query
+          description: Number of results to return
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: filter
+          in: query
+          description: Metadata filter expression
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Vector query results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VectorQueryResponse'
+              example:
+                namespace: search_agent
+                results:
+                  - id: vec1
+                    score: 0.87
+                    metadata:
+                      source_type: markdown
+                      category: documentation
+                      timestamp: 1648756800
+                  - id: vec2
+                    score: 0.76
+                    metadata:
+                      source_type: web
+                      category: documentation
+                      timestamp: 1648670400
+                count: 2
+                executionTimeMs: 42
+        '400':
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '404':
+          description: Namespace not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+  /benchmarks:
+    post:
+      summary: Execute a new benchmark
+      description: Starts a new benchmark run with the specified configuration
+      operationId: createBenchmark
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BenchmarkRequest'
+            example:
+              benchmarkType: memory
+              configOverrides:
+                app.services.openai.max_tokens: 4096
+              verbose: true
+      responses:
+        '202':
+          description: Benchmark accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  benchmarkId:
+                    type: string
+                    format: uuid
+                  status:
+                    type: string
+                    enum: [accepted, running]
+                  estimatedCompletionTime:
+                    type: string
+                    format: date-time
+components:
+  schemas:
+    VectorQueryResult:
+      type: object
+      required:
+        - id
+        - score
+        - metadata
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the vector
+        score:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          description: Similarity score between query and result
+        vector:
+          type: array
+          items:
+            type: number
+          description: Vector values (only included when explicitly requested)
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Metadata associated with the vector
+    VectorQueryResponse:
+      type: object
+      required:
+        - namespace
+        - results
+        - count
+        - executionTimeMs
+      properties:
+        namespace:
+          type: string
+          description: The namespace that was queried
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/VectorQueryResult'
+          description: Array of matching vector results
+        count:
+          type: integer
+          minimum: 0
+          description: Total number of results returned
+        executionTimeMs:
+          type: number
+          format: float
+          minimum: 0
+          description: Execution time in milliseconds
+    ApiError:
+      type: object
+      required:
+        - code
+        - message
+        - requestId
+      properties:
+        code:
+          type: string
+          description: Error code for machine-readable identification
+        message:
+          type: string
+          description: Human-readable error message
+        details:
+          type: object
+          additionalProperties: true
+          description: Optional details about the error
+        requestId:
+          type: string
+          description: Request ID for tracking errors through logs
+    BenchmarkRequest:
+      type: object
+      required:
+        - benchmarkType
+      properties:
+        benchmarkType:
+          type: string
+          description: Type of benchmark to run
+        configOverrides:
+          type: object
+          additionalProperties: true
+          description: Configuration overrides for this benchmark run
+        verbose:
+          type: boolean
+          default: false
+          description: Whether to run in verbose mode with additional logging

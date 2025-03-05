@@ -1,0 +1,41 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 0 * * 0'  # Run weekly on Sundays at midnight
+
+jobs:
+  checkov-scan:
+    name: Checkov IaC Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install checkov jq
+          
+      - name: Make script executable
+        run: chmod +x /workspaces/cherry/scripts/security_scan.sh
+        
+      - name: Run Checkov
+        run: ./scripts/security_scan.sh
+        
+      - name: Archive security scan results
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: checkov-results
+          path: ./reports/checkov/

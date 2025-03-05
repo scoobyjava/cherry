@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "configurations": [
+    {
+      "language": "python",
+      "settings": {
+        "maxTokens": 1000,
+        "temperature": 0.5
+      }
+    },
+    {
+      "language": "javascript",
+      "settings": {
+        "maxTokens": 1000,
+        "temperature": 0.5
+      }
+    }
+  ]
+}

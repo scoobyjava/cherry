@@ -1,0 +1,22 @@
+soft-fail: false
+framework: all
+download-external-modules: true
+evaluate-variables: true
+repo-id: cherry
+skip-check:
+  - CKV_AWS_123
+  - CKV_GCP_45
+skip-path:
+  - node_modules
+  - .git
+  - "*.test.*"
+  - test/fixtures/*
+output:
+  - cli
+  - json:/workspaces/cherry/reports/checkov/results.json
+  - junitxml:/workspaces/cherry/reports/checkov/results.xml
+  - sarif:/workspaces/cherry/reports/checkov/results.sarif
+compact: false
+quiet: false
+summary-position: top
+skip-suppressions: false

@@ -1,0 +1,17 @@
+{
+  "warning_threshold": 40,
+  "error_threshold": 80,
+  "file_extensions": [".py", ".js", ".ts", ".jsx", ".tsx"],
+  "exclude_dirs": [
+    "node_modules", 
+    "venv", 
+    ".git", 
+    "__pycache__", 
+    "dist", 
+    "build"
+  ],
+  "exclude_files": [
+    "generated_*.py",
+    "*.min.js"
+  ]
+}

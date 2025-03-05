@@ -1,0 +1,20 @@
+compact: true
+directory:
+  - /workspaces/cherry
+download-external-modules: true
+evaluate-variables: true
+external-checks-dir:
+  - /workspaces/cherry/security/custom_checks
+framework:
+  - all
+quiet: false
+skip-check:
+  - CKV_SECRET_6  # Skip specific checks that might not be applicable
+  - CKV_K8S_21
+skip-path:
+  - /workspaces/cherry/node_modules
+  - /workspaces/cherry/dist
+  - /workspaces/cherry/build
+output:
+  - cli
+  - json:/workspaces/cherry/security/scan_results.json

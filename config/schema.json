@@ -1,0 +1,44 @@
+{
+  "database": {
+    "connection": {
+      "type": "object",
+      "properties": {
+        "timeout_seconds": {"type": "number", "minimum": 1},
+        "max_connections": {"type": "number", "minimum": 1},
+        "retry": {
+          "type": "object",
+          "properties": {
+            "max_attempts": {"type": "number", "minimum": 1},
+            "backoff_ms": {"type": "number", "minimum": 100}
+          }
+        }
+      }
+    },
+    "backup": {
+      "type": "object",
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "schedule": {"type": "string", "format": "cron"},
+        "retention_days": {"type": "number", "minimum": 1},
+        "validation": {
+          "type": "object",
+          "properties": {
+            "verify_after_backup": {"type": "boolean"},
+            "notify_on_failure": {"type": "boolean"}
+          }
+        }
+      }
+    }
+  },
+  "api": {
+    "rate_limiting": {
+      "type": "object",
+      "properties": {
+        "requests_per_minute": {"type": "number"},
+        "retry_on_limit": {"type": "boolean"},
+        "max_retries": {"type": "number"},
+        "backoff_ms": {"type": "number"}
+      }
+    }
+  }
+}
