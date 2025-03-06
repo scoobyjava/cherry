@@ -5,7 +5,7 @@
   "main": "src/app.js",
   "scripts": {
     "start": "node src/app.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "sonar": "sonar-scanner",
     "sonar:start": "docker-compose -f docker/sonarqube-docker-compose.yml up -d",
     "sonar:stop": "docker-compose -f docker/sonarqube-docker-compose.yml down",
@@ -14,12 +14,35 @@
   "author": "Your Name",
   "license": "MIT",
   "devDependencies": {
+    "jest": "^29.0.0",
     "sonarqube-scanner": "^3.0.0"
   },
   "dependencies": {
-    "esprima": "^4.0.1",
-    "complexity-report": "^2.0.0-alpha",
     "chalk": "^4.1.2",
+    "complexity-report": "^2.0.0-alpha",
+    "esprima": "^4.0.1",
+    "node-fetch": "^3.3.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.2.0",
     "yargs": "^17.7.2"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/?(*.)+(spec|test).[jt]s?(x)"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "collectCoverage": true,
+    "coverageDirectory": "coverage",
+    "coverageReporters": [
+      "text",
+      "lcov"
+    ],
+    "moduleNameMapper": {
+      "^@logger$": "<rootDir>/src/logger"
+    }
   }
 }

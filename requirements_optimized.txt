@@ -1,0 +1,36 @@
+fastapi>=0.68.0
+uvicorn[standard]>=0.15.0
+python-dotenv>=0.19.0
+openai
+chromadb
+numpy>=1.24.0
+networkx
+langchain
+langchain-openai
+langchain-community
+langchain-experimental
+pydantic>=1.8.2
+Flask>=2.1.3
+requests>=2.28.1
+pandas>=2.0.0
+scikit-learn>=1.1.3
+python-decouple
+flask>=2.0.0
+
+# Code analysis dependencies
+astpretty
+radon
+pylint
+black
+
+# Dependencies for Pinecone vector archiving
+pinecone>=2.2.1
+psycopg2-binary>=2.9.6
+schedule>=1.1.0
+
+# Dependencies for running benchmarks
+psutil>=5.9.5
+matplotlib>=3.7.1
+
+# Checkov for infrastructure scanning
+checkov>=2.3.234
