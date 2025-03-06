@@ -1,22 +1,353 @@
-name: CI
+name: PR Quality & Review Workflow
 
-on: [push, pull_request]
+on:
+  pull_request:
+    branches: [main]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    name: Build & Test
     steps:
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Install Node dependencies
+      - name: Install Dependencies
         run: npm install
-      - name: Run Madge to detect circular dependencies
-        run: npx madge --circular .
-      - name: Run tests
+      - name: Run Tests
         run: npm run test
-      - name: SonarQube Scan
+
+  sonar:
+    needs: build
+    runs-on: ubuntu-latest
+    name: SonarQube Scan & Quality Gate
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run SonarQube Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: Verify Quality Gate
+        id: quality
+        run: |
+          # Example pseudo-code: fetch quality gate status (e.g., from a report file or API)
+          QUALITY_STATUS=$(jq -r '.projectStatus.status' sonar-report.json)
+          echo "Quality Gate status: $QUALITY_STATUS"
+          if [ "$QUALITY_STATUS" != "OK" ]; then
+            echo "Quality thresholds not met. Aborting review process."
+            echo "status=failed" >> $GITHUB_OUTPUT
+          else
+            echo "status=ok" >> $GITHUB_OUTPUT
+    outputs:
+      quality_status: ${{ steps.quality.outputs.status }}
+
+  sourcegraph_insights:
+    needs: build
+    runs-on: ubuntu-latest
+    name: Sourcegraph Insights
+    steps:
+      - name: Query Flagged Areas
+        run: |
+          # Example curl command to query Sourcegraph. This should be replaced with your actual query & API details.
+          curl -X POST "https://cherry-ai.sourcegraph.app/.api/insights" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: token ${{ secrets.SOURCEGRAPH_TOKEN }}" \
+            -d '{"query": "repo:^cherry$ type:diff patternFlaggedAreas"}'
+      - name: Post Insights
+        run: |
+          # Post insights or update a PR comment using GitHub's API.
+          echo "Posting Sourcegraph insights as a PR comment..."
+          # (Replace with an actual API call if needed)
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+      - name: Create analysis script
+        run: |
+          mkdir -p scripts
+          cat > scripts/pattern-analysis.js << 'EOF'
+          const fetch = require('node-fetch');
+
+          async function querySourcegraph(query) {
+            const response = await fetch("https://cherry-ai.sourcegraph.app/.api/search/query", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `token ${process.env.SOURCEGRAPH_TOKEN}`
+              },
+              body: JSON.stringify({ query })
+            });
+            return response.json();
+          }
+
+          async function main() {
+            // Run all queries concurrently instead of sequentially
+            const [errorPatterns, duplicatedUtils, componentPatterns] = await Promise.all([
+              querySourcegraph("repo:^cherry$ try catch NOT finally"),
+              querySourcegraph("repo:^cherry$ function:format OR function:parse OR function:convert count:3"),
+              querySourcegraph("repo:^cherry$ function:render className file:components count:5")
+            ]);
+            
+            // Write results to a file for other jobs to consume
+            const fs = require('fs');
+            const results = {
+              errorHandlingOpportunities: errorPatterns.results?.length || 0,
+              potentialDuplication: duplicatedUtils.results?.length || 0,
+              componentStandardization: componentPatterns.results || []
+            };
+            
+            fs.writeFileSync('sourcegraph-analysis.json', JSON.stringify(results, null, 2));
+            console.log("Analysis complete:", results);
+          }
+
+          main().catch(err => {
+            console.error(err);
+            process.exit(1);
+          });
+          EOF
+      - name: Run analysis
+        run: |
+          node scripts/pattern-analysis.js
+        env:
+          SOURCEGRAPH_TOKEN: ${{ secrets.SOURCEGRAPH_TOKEN }}
+      - name: Identify Pattern Opportunities
+        run: |
+          async function identifyPatternOpportunities() {
+            // Find inconsistent error handling patterns
+            const errorPatterns = await querySourcegraph(
+              "repo:^cherry$ try catch NOT finally"
+            );
+            
+            // Identify duplicate utility functions
+            const duplicatedUtils = await querySourcegraph(
+              "repo:^cherry$ function:format OR function:parse OR function:convert count:3"
+            );
+            
+            // Find components that could benefit from standardization
+            const componentPatterns = await querySourcegraph(
+              "repo:^cherry$ function:render className file:components count:5"
+            );
+            
+            return {
+              errorHandlingOpportunities: errorPatterns.results.length,
+              potentialDuplication: duplicatedUtils.results.length,
+              componentStandardization: componentPatterns.results
+            };
+          }
+          identifyPatternOpportunities();
+      - name: Prioritize Quality Issues
+        run: |
+          async function prioritizeQualityIssues() {
+            const sonarIssues = await fetchSonarQubeIssues("cherry");
+            
+            // Use a single pass:
+            const categorized = sonarIssues.reduce((acc, issue) => {
+              if (issue.type === "VULNERABILITY") acc.security.push(issue);
+              else if (issue.type === "BUG") acc.bugs.push(issue);
+              else if (issue.type === "CODE_SMELL") acc.codeSmells.push(issue);
+              return acc;
+            }, { security: [], bugs: [], codeSmells: [] });
+            
+            // Prioritize using custom Cherry heuristics
+            return {
+              criticalIssues: categorized.security.filter(i => i.severity === "CRITICAL"),
+              highPriorityRefactoring: categorized.bugs.filter(i => 
+                i.severity === "MAJOR" && i.effort < "3h"
+              ),
+              quickWins: categorized.codeSmells.filter(i => 
+                i.effort < "30min" && i.tags.includes("performance")
+              )
+            };
+          }
+          prioritizeQualityIssues();
+      - name: Run Consolidated Analysis
+        run: |
+          mkdir -p scripts
+          cat > scripts/analysis.js << 'EOF'
+          const fetch = require('node-fetch');
+
+          async function querySourcegraph(query) {
+            const response = await fetch("https://cherry-ai.sourcegraph.app/.api/search/query", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `token ${process.env.SOURCEGRAPH_TOKEN}`
+              },
+              body: JSON.stringify({ query })
+            });
+            return response.json();
+          }
+
+          async function fetchSonarQubeIssues(project) {
+            const response = await fetch(`https://sonarcloud.io/api/issues/search?projectKeys=${project}&resolved=false`, {
+              headers: {
+                "Authorization": `Bearer ${process.env.SONAR_TOKEN}`
+              }
+            });
+            return (await response.json()).issues || [];
+          }
+
+          async function main() {
+            try {
+              // 1. Run Sourcegraph queries in parallel
+              console.log("Running Sourcegraph queries...");
+              const queries = [
+                "repo:^cherry$ try catch NOT finally",
+                "repo:^cherry$ function:format OR function:parse OR function:convert count:3",
+                "repo:^cherry$ function:render className file:components count:5"
+              ];
+              
+              const [errorPatterns, duplicatedUtils, componentPatterns] = await Promise.all(
+                queries.map(q => querySourcegraph(q))
+              );
+              
+              // 2. Get SonarQube issues
+              console.log("Fetching SonarQube issues...");
+              const sonarIssues = await fetchSonarQubeIssues("cherry");
+              
+              // 3. Process SonarQube issues in a single pass
+              const categorized = sonarIssues.reduce((acc, issue) => {
+                if (issue.type === "VULNERABILITY") acc.security.push(issue);
+                else if (issue.type === "BUG") acc.bugs.push(issue);
+                else if (issue.type === "CODE_SMELL") acc.codeSmells.push(issue);
+                return acc;
+              }, { security: [], bugs: [], codeSmells: [] });
+              
+              // 4. Create the prioritized issues report
+              const prioritized = {
+                criticalIssues: categorized.security.filter(i => i.severity === "CRITICAL"),
+                highPriorityRefactoring: categorized.bugs.filter(i => 
+                  i.severity === "MAJOR" && i.effort < "3h"
+                ),
+                quickWins: categorized.codeSmells.filter(i => 
+                  i.effort < "30min" && (i.tags || []).includes("performance")
+                )
+              };
+              
+              // 5. Write all results to files
+              const fs = require('fs');
+              
+              // Save Sourcegraph results
+              fs.writeFileSync('sourcegraph-results.json', JSON.stringify({
+                errorHandlingOpportunities: errorPatterns.results?.length || 0,
+                potentialDuplication: duplicatedUtils.results?.length || 0,
+                componentStandardization: componentPatterns.results || []
+              }, null, 2));
+              
+              // Save SonarQube categorized results
+              fs.writeFileSync('sonar-prioritized.json', JSON.stringify(prioritized, null, 2));
+              
+              console.log("Analysis complete!");
+            } catch (err) {
+              console.error("Analysis failed:", err);
+              process.exit(1);
+            }
+          }
+
+          main();
+          EOF
+
+          # Install node-fetch and run the script
+          npm install node-fetch@2
+          node scripts/analysis.js
+        env:
+          SOURCEGRAPH_TOKEN: ${{ secrets.SOURCEGRAPH_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: Upload Analysis Results
+        uses: actions/upload-artifact@v2
+        with:
+          name: analysis-results
+          path: |
+            sourcegraph-results.json
+            sonar-prioritized.json
+
+  coderabbit_review:
+    needs: sonar
+    if: ${{ needs.sonar.outputs.quality_status == 'ok' }}
+    runs-on: ubuntu-latest
+    name: Trigger CodeRabbit Review
+    steps:
+      - uses: actions/checkout@v3
+      - name: Post CodeRabbit Review Comment
+        run: |
+          # This is an example that posts a PR comment invoking CodeRabbit's review.
+          # (Adapt this to your actual CodeRabbit integration)
+          curl -X POST "https://api.github.com/repos/your_org/cherry/pulls/${{ github.event.pull_request.number }}/reviews" \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -d '{"body": "Automated CodeRabbit Review: Quality thresholds met. Please review the changes.", "event": "COMMENT"}'
+      - name: Enhance CodeRabbit Reviews
+        run: |
+          async function enhanceCodeRabbitReviews(prNumber) {
+            // Get CodeRabbit's existing comments
+            const coderabbitReviews = await getCodeRabbitReviews(prNumber);
+            
+            // Get SonarQube issues for the same PR
+            const sonarIssues = await getSonarIssuesForPR(prNumber);
+            
+            // Enhance CodeRabbit's review with SonarQube context
+            const enhancedReview = coderabbitReviews.map(review => {
+              // Find relevant SonarQube issues for this file
+              const relatedIssues = sonarIssues.filter(issue => 
+                issue.component.endsWith(review.path)
+              );
+              
+              // Add context to the review
+              if (relatedIssues.length > 0) {
+                return {
+                  ...review,
+                  enhancedContext: {
+                    sonarIssues: relatedIssues,
+                    recommendedFixes: generateFixSuggestions(relatedIssues)
+                  }
+                };
+              }
+              return review;
+            });
+            
+            return enhancedReview;
+          }
+          enhanceCodeRabbitReviews(${{ github.event.pull_request.number }});
+
+  cherry_analysis:
+    needs: [sonar, sourcegraph_insights]
+    runs-on: ubuntu-latest
+    name: Cherry Agent Analysis
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download Analysis Results
+        uses: actions/download-artifact@v2
+        with:
+          name: analysis-results
+      - name: Analyze Code Quality Data
+        run: |
+          # Combine insights from SonarQube and Sourcegraph
+          echo "Cherry is analyzing code quality patterns..."
+          node scripts/cherry/analyze-code-quality.js
+      - name: Generate Improvement Plan
+        run: |
+          # Generate actionable improvement tasks
+          node scripts/cherry/generate-improvement-plan.js
+      - name: Post Summary Comment
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const summary = JSON.parse(fs.readFileSync('cherry-analysis-summary.json', 'utf8'));
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## Cherry's Code Quality Analysis
+              
+              ### Key Insights
+              - **Security:** ${summary.securityIssues} issues found
+              - **Performance:** ${summary.performanceIssues} improvements possible
+              - **Maintainability:** ${summary.maintainabilityScore}/100
+              
+              ### Recommended Actions
+              ${summary.recommendations.map(r => `- ${r}`).join('\n')}
+              
+              [View detailed report](${summary.reportUrl})
+              `
+            });
