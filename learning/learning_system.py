@@ -7,6 +7,8 @@ import os
 from collections import Counter
 import glob
 
+from learning.test_generator import TestGenerator
+
 logger = logging.getLogger("CherryLearning")
 logging.basicConfig(level=logging.INFO)
 
@@ -131,14 +133,23 @@ class LearningSystem:
         for report_path in reports:
             try:
                 with open(report_path, 'r') as f:
-                    report = json.load(f)
+                    report_data = json.load(f)
 
-                durations.append(report.get("duration", 0))
+                # Fix for the deployment_history.json issue - check data type
+                if isinstance(report_data, list):
+                    # Handle list format - likely deployment_history.json
+                    logger.info(
+                        f"Found list-formatted report in {report_path}")
+                    continue  # Skip this report or process it differently
 
-                resource = report.get("resource_usage", {})
-                if resource:
-                    cpu_usage.append(resource.get("cpu_percent", 0))
-                    memory_usage.append(resource.get("memory_usage", 0))
+                # Process dictionary-formatted reports
+                if isinstance(report_data, dict):
+                    durations.append(report_data.get("duration", 0))
+
+                    resource = report_data.get("resource_usage", {})
+                    if resource and isinstance(resource, dict):
+                        cpu_usage.append(resource.get("cpu_percent", 0))
+                        memory_usage.append(resource.get("memory_usage", 0))
 
             except Exception as e:
                 logger.error(
@@ -213,6 +224,15 @@ class LearningSystem:
         logger.info(f"Analysis log saved to {log_file}")
 
         return suggestions
+
+    def generate_test_cases(self, count: int = 3) -> List[Dict[str, Any]]:
+        """Generate test cases based on learning from past reports"""
+        generator = TestGenerator(self.simulation_reports_dir)
+        test_cases = generator.generate_tests(count)
+
+        logger.info(
+            f"Generated {len(test_cases)} new test cases based on past patterns")
+        return test_cases
 
     def _get_latest_reports(self, directory: str, limit: int) -> List[str]:
         """Get the latest reports from a directory, sorted by timestamp"""
