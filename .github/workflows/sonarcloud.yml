@@ -1,0 +1,83 @@
+name: SonarCloud Analysis
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  sonar:
+    name: SonarCloud Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: "14"
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          # Customize your project key and name as needed:
+          SONAR_PROJECT_KEY: "cherry-react"
+          SONAR_PROJECT_NAME: "Cherry React Components"
+          # Limit analysis to React component files:
+          SONAR_SCANNER_OPTS: "-Dsonar.sources=src -Dsonar.inclusions=src/**/*.jsx,src/**/*.tsx"
+
+# Cherry Project
+
+Cherry is a project designed to deliver a high-quality software solution by leveraging modern development tools, automated CI/CD workflows, and code quality analysis.
+
+## Project Structure
+
+- **api/**  
+  Contains backend API logic:
+  - **controllers/**: Functions that handle HTTP requests.
+  - **models/**: Data models and type definitions.
+  - `fetch_data.py`: API client implementations with retry and error handling logic.
+
+- **src/**  
+  Contains frontend application code (React):
+  - **components/**: Reusable, presentational components.
+  - **containers/**: Components managing state and business logic.
+  - **hooks/**: Custom React hooks.
+  - **styles/**: Application-wide styling (CSS/Tailwind files).
+  - **utilities/**: Shared utility functions.
+  - `App.jsx`: Main application component.
+  - `index.jsx`: Entry point for the React app.
+
+- **tests/**  
+  Contains unit tests and integration tests to ensure code reliability.
+
+- **.github/workflows/**  
+  Hosts GitHub Actions workflows:
+  - `ci.yml`: Continuous integration tasks (build, test, scan).
+  - `sonarcloud.yml`: SonarCloud analysis for code quality, focusing on React components.
+
+- **.devcontainer/**  
+  Contains configuration to set up the development container (especially for GitHub Codespaces).
+
+- **scripts/**  
+  Custom scripts used for additional analysis or automation tasks.
+
+- **sonar-project.properties** (optional)  
+  Configuration file for SonarQube if not using environment options.
+
+- **package.json**  
+  Node project configuration including dependencies and npm scripts.
+
+## Getting Started
+
+1. **Clone the Repository**  
+   ```bash
+   git clone https://github.com/your_org/cherry.git
+   cd cherry
