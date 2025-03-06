@@ -56,3 +56,9 @@ chroma_data/
 # Logs
 *.log
 logs/
+
+# NodeJS and Next.js dependencies and build artifacts
+node_modules/
+web/node_modules/
+web/.next/
+web/out/
