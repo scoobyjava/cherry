@@ -173,6 +173,8 @@ class StagingDeploymentAgent:
 
 
 async def run_staging_deployment():
+    logger.info(
+        "Hello, Cherry world! 🍒 I'm feeling lively and ready to deploy your code!")
     logger.info("Starting staging deployment tests.")
     start_time = datetime.datetime.now()
 
@@ -225,8 +227,10 @@ async def run_staging_deployment():
     # --- New: Add resource usage and task expansion metrics ---
     cpu_usage = psutil.cpu_percent(interval=0.1)
     memory_usage = psutil.virtual_memory().percent
-    report_data["resource_usage"] = {"cpu_percent": cpu_usage, "memory_usage": memory_usage}
-    report_data["task_expansion"] = len(user_task)  # basic measure of task details
+    report_data["resource_usage"] = {
+        "cpu_percent": cpu_usage, "memory_usage": memory_usage}
+    report_data["task_expansion"] = len(
+        user_task)  # basic measure of task details
 
     # Save individual deployment report
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -260,7 +264,8 @@ async def run_staging_deployment():
         logger.error(f"Failed to update historical data: {e}")
 
     # Compute average duration from history and derive insights
-    durations = [entry.get("duration", 0) for entry in history if entry.get("duration")]
+    durations = [entry.get("duration", 0)
+                 for entry in history if entry.get("duration")]
     avg_duration = sum(durations) / len(durations) if durations else duration
     if duration < avg_duration:
         insight = "Deployment is faster than historical average."

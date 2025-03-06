@@ -5,6 +5,7 @@ import datetime
 import os
 import json
 from typing import Dict, Any, List
+from simulation.edge_cases import EdgeCaseGenerator
 
 logger = logging.getLogger("CherrySimulation")
 logging.basicConfig(level=logging.INFO)
@@ -70,7 +71,7 @@ class SimulatedEnvironment:
         return requests.get(request_type, requests["code_fix"])
 
 
-async def run_simulation():
+async def run_simulation(include_edge_cases=False):
     """Main entry point for simulation - called from integration workflows"""
     logger.info("Starting Cherry simulation...")
 
@@ -91,6 +92,87 @@ async def run_simulation():
     request_types = ["code_fix", "feature_design",
                      "deployment"] * 2  # 6 requests in total
     total_time = 0
+
+    # Add edge cases if requested
+    if include_edge_cases:
+        logger.info("Including edge cases in simulation")
+        edge_generator = EdgeCaseGenerator()
+
+        # Add edge case tests
+        try:
+            logger.info("Testing with malformed input")
+            malformed_case = await edge_generator.malformed_input_test()
+            # Process the malformed input
+            if malformed_case.get("type") == "code_fix":
+                try:
+                    response = await apis["code"](malformed_case.get("code", ""))
+                    metrics["tasks"].append({
+                        "request_type": "edge_case_malformed",
+                        "request_data": malformed_case,
+                        "response": response,
+                        "success": True
+                    })
+                    metrics["success_count"] += 1
+                except Exception as e:
+                    metrics["tasks"].append({
+                        "request_type": "edge_case_malformed",
+                        "request_data": malformed_case,
+                        "error": str(e),
+                        "success": False
+                    })
+                    metrics["failure_count"] += 1
+        except Exception as e:
+            logger.error(f"Error in malformed input test: {e}")
+
+        # Test timeout handling
+        try:
+            logger.info("Testing timeout handling")
+            start_time = datetime.datetime.now()
+            try:
+                await asyncio.wait_for(edge_generator.timeout_simulation(), timeout=1.0)
+                success = True
+                response = {"status": "success"}
+            except asyncio.TimeoutError:
+                success = True  # Successfully detected timeout
+                response = {"status": "timeout_handled"}
+            except Exception as e:
+                success = False
+                response = {"status": "error", "message": str(e)}
+
+            duration = (datetime.datetime.now() - start_time).total_seconds()
+            metrics["tasks"].append({
+                "request_type": "edge_case_timeout",
+                "duration": duration,
+                "response": response,
+                "success": success
+            })
+            if success:
+                metrics["success_count"] += 1
+            else:
+                metrics["failure_count"] += 1
+        except Exception as e:
+            logger.error(f"Error in timeout test: {e}")
+
+        # Test concurrent operations
+        try:
+            logger.info("Testing concurrent operations")
+            start_time = datetime.datetime.now()
+            concurrent_results = await edge_generator.concurrent_operation_test()
+            duration = (datetime.datetime.now() - start_time).total_seconds()
+
+            metrics["tasks"].append({
+                "request_type": "edge_case_concurrent",
+                "duration": duration,
+                "results": concurrent_results,
+                # Success if more than 50% passed
+                "success": concurrent_results["success_rate"] > 0.5
+            })
+            if concurrent_results["success_rate"] > 0.5:
+                metrics["success_count"] += 1
+            else:
+                metrics["failure_count"] += 1
+        except Exception as e:
+            logger.error(f"Error in concurrent operations test: {e}")
 
     for req_type in request_types:
         start_time = datetime.datetime.now()
