@@ -1,13 +1,13 @@
-const fetch = require("node-fetch");
+// Use dynamic import for node-fetch instead of require
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 const logger = {
   info: (msg) => {
-    console.log("[INFO]", msg);
+    console.log(`[INFO] ${msg}`);
   },
   error: (msg) => {
-    console.error("[ERROR]", msg);
-    // If an n8n webhook URL is provided in the environment,
-    // "fire-and-forget" send the error details to n8n.
+    console.error(`[ERROR] ${msg}`);
+    // n8n webhook operations if configured
     if (process.env.N8N_WEBHOOK_URL) {
       fetch(process.env.N8N_WEBHOOK_URL, {
         method: "POST",
@@ -22,6 +22,9 @@ const logger = {
       });
     }
   },
+  warn: (msg) => {
+    console.warn(`[WARN] ${msg}`);
+  }
 };
 
 module.exports = logger;

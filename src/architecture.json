@@ -1,0 +1,76 @@
+{
+  "pages": [
+    {
+      "name": "Home",
+      "route": "/",
+      "components": [
+        "Header",
+        "HeroSection",
+        "FeatureGrid",
+        "Footer"
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "route": "/dashboard",
+      "components": [
+        "Header",
+        "DashboardStats",
+        "AgentStatus",
+        "Footer"
+      ]
+    }
+  ],
+  "components": [
+    {
+      "name": "Header",
+      "type": "functional",
+      "props": [
+        "title",
+        "user"
+      ]
+    },
+    {
+      "name": "Footer",
+      "type": "functional",
+      "props": []
+    },
+    {
+      "name": "HeroSection",
+      "type": "functional",
+      "props": [
+        "headline",
+        "subtext",
+        "ctaText"
+      ]
+    },
+    {
+      "name": "FeatureGrid",
+      "type": "functional",
+      "props": [
+        "features"
+      ]
+    },
+    {
+      "name": "DashboardStats",
+      "type": "class",
+      "props": [
+        "metrics",
+        "period"
+      ]
+    },
+    {
+      "name": "AgentStatus",
+      "type": "class",
+      "props": [
+        "agents",
+        "onActivate"
+      ]
+    }
+  ],
+  "dataFlow": {
+    "auth": "Context API",
+    "metrics": "API Fetch + Local Storage",
+    "agentStatus": "WebSocket"
+  }
+}

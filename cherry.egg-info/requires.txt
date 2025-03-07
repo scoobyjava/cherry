@@ -1,0 +1,9 @@
+flask
+numpy
+psycopg2-binary
+pinecone
+sentence-transformers
+torch
+langchain
+requests
+python-dotenv
