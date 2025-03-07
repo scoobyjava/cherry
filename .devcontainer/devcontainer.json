@@ -75,3 +75,4 @@
   "postCreateCommand": "npm install && if [ -f requirements.txt ]; then pip install -r requirements.txt; fi && pip install pylint pytest && npm install -g madge",
   "postStartCommand": "git config --global pull.rebase true && echo 'Extensions installed. Sourcegraph, SonarLint, and GitHub Copilot are ready to use.' > /dev/null"
 }
+
