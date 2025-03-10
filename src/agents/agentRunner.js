@@ -464,12 +464,14 @@ class AgentRunner {
     const checkSonarQube = new Promise((resolve) => {//-
       exec("pgrep -f sonarqube", (error, stdout, stderr) => {//-
         if (error || !stdout.trim()) {//-
-          logger.error("SonarQube process not detected. Attempting restart...");//-
+
+          logger.error("SonarQube process not detected. Attempting restart...", { error: error && error.message });//-
           exec(//-
             process.env.SONARQUBE_START_CMD || "docker start sonarqube_container",//-
             (err) => {//-
               if (err) {//-
-                logger.error("Failed to restart SonarQube: " + err.message);//-
+
+                logger.error("Failed to restart SonarQube: " + err.message, { error: err });//-
               } else {//-
                 logger.info("SonarQube restarted successfully.");//-
                 results.sonarqube = true;//-
@@ -483,8 +485,8 @@ class AgentRunner {
           resolve();//-
         }//-
       });//-
-    });//-
-//-
+
+    });//-//-
     // Check Cody extension//-
     const checkCody = new Promise((resolve) => {//-
       exec("code --list-extensions", (error, stdout, stderr) => {//-

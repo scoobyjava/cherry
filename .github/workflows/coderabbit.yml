@@ -1,0 +1,19 @@
+name: CodeRabbit Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  coderabbit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      
+      - name: CodeRabbit Review
+        uses: coderabbitai/coderabbit-action@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}

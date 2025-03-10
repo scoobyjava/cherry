@@ -1,21 +1,23 @@
 # Use the official slim Python 3.9 image
-FROM python:3.9-slim
+FROM node:20-alpine
 
 # Set the working directory in the container
 WORKDIR /app
 
+# Copy package files first for better caching
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
 # Copy project files into the container
-COPY . /app
+COPY . .
 
-# Install required Python libraries
-RUN pip install -r requirements.txt
-
-# Expose port 5000
-EXPOSE 5000
+# Expose port 3001
+EXPOSE 3001
 
 # Specify the command to run the application
-CMD ["python", "backend.py"]
-
+CMD ["node", "src/api/githubWebhook.js"]
 # Example task update snippet
 class TaskManager:
 def __init__(self):

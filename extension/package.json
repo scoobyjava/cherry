@@ -1,0 +1,40 @@
+{
+  "name": "github-config-assistant",
+  "displayName": "GitHub Configuration Assistant",
+  "description": "Keep GitHub configuration advice up-to-date in Codespaces",
+  "version": "0.1.0",
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:yaml",
+    "onLanguage:json"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "github-config-assistant.checkForUpdates",
+        "title": "Check for GitHub Schema Updates"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "dependencies": {
+    "@octokit/rest": "^18.12.0",
+    "js-yaml": "^4.1.0",
+    "node-fetch": "^3.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.7",
+    "@types/vscode": "^1.60.0",
+    "typescript": "^4.5.5"
+  }
+}
