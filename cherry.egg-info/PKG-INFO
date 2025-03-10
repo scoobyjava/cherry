@@ -1,0 +1,14 @@
+Metadata-Version: 2.2
+Name: cherry
+Version: 0.1
+License-File: LICENSE
+Requires-Dist: flask
+Requires-Dist: numpy
+Requires-Dist: psycopg2-binary
+Requires-Dist: pinecone
+Requires-Dist: sentence-transformers
+Requires-Dist: torch
+Requires-Dist: langchain
+Requires-Dist: requests
+Requires-Dist: python-dotenv
+Dynamic: requires-dist

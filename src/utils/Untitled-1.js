@@ -1,0 +1,1 @@
+0 * * * * /workspaces/cherry/autosave.sh >> /workspaces/cherry/autosave.log 2>&1

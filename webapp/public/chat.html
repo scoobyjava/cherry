@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Group Chat with Cherry & Agents</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Group Chat</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="ideas.html">Creative Ideas</a>
+    </nav>
+  </header>
+  <main id="chatRoom">
+    <div id="messages"></div>
+    <div id="inputArea">
+      <select id="agentSelect">
+        <option value="cherry" selected>Cherry (Coordinator)</option>
+        <option value="developer">Developer Agent</option>
+        <option value="creative">Creative Agent</option>
+        <!-- Add more agents as desired -->
+      </select>
+      <input id="chatInput" autocomplete="off" placeholder="Type your message…">
+      <button id="sendBtn">Send</button>
+    </div>
+  </main>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const messagesDiv = document.getElementById('messages');
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const agentSelect = document.getElementById('agentSelect');
+
+    sendBtn.addEventListener('click', () => {
+      const agent = agentSelect.value;
+      const message = chatInput.value;
+      if (message.trim().length > 0) {
+        // Send message via Socket.io.
+        socket.emit('chat message', { agent, message });
+        chatInput.value = '';
+      }
+    });
+
+    // Listen for chat messages from server.
+    socket.on('chat message', (msg) => {
+      const messageItem = document.createElement('div');
+      messageItem.classList.add('message');
+      messageItem.innerHTML = `<strong>${msg.agent}</strong>: ${msg.response} <br/><em>You said:</em> ${msg.user}`;
+      messagesDiv.appendChild(messageItem);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    });
+  </script>
+</body>
+</html>

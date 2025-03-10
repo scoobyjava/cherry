@@ -1,521 +1,678 @@
-const { exec } = require("child_process");
-const fs = require("fs").promises;
-const path = require("path");
+<<<<<<< Tabnine <<<<<<<
+const { exec } = require("child_process");//-
 const logger = require("../logger");
+const path = require("path");//-
+const fs = require("fs").promises;//-
+const crypto = require("crypto");//-
 
+// Use dynamic import for fetch//-
+const fetch = (...args) =>//-
+  import("node-fetch").then(({ default: fetch }) => fetch(...args));//-
+//-
+/**//-
+ * AgentRunner class for managing Cherry's agent operations//-
+ * and website building process//-
+ *///-
 class AgentRunner {
-  constructor(config = {}) {
-    this.agentName = config.agentName || "cherry";
+  constructor(options = {}) {//-
+    this.agentName = options.agentName || "cherry";//-
+  constructor({ agentName }) {//+
+    this.agentName = agentName;//+
     this.taskQueue = [];
-    this.isRunning = false;
-    this.decisionHistory = [];
-    this.metrics = {
-      tasksCompleted: 0,
-      tasksFailed: 0,
-      codeGenerated: 0,
-      testsRun: 0,
-    };
-
-    // Add these initializations
-    this.pattern_extractor = {
-      analyze: (code) => ({}), // Placeholder implementation
-      analyze_failure: (error) => ({}),
-    };
-
-    this.knowledge_base = {
-      reinforce_patterns: () => {},
-      avoid_patterns: () => {},
-      apply_human_feedback: () => {},
-      extract_recent_learnings: () => [],
-      integrate: () => {},
-    };
-
-    this.knowledge_validator = {
-      is_applicable: () => true,
-    };
-
-    this.trust_map = {};
+    this.isProcessing = false;//-
+    this.knowledge_base = {//-
+      integrate: (data) => {//-
+        // Simple implementation of knowledge base integration//-
+        logger.info(`[${this.agentName}] Adding to knowledge base: ${data.type}`);//-
+        // In a real implementation, you would store this data somewhere//-
+      }//-
+    };//-
+    this.decisionHistory = [];//-
+    this.availableTools = {//-
+      n8n: false,//-
+      sonarqube: false,//-
+      cody: false,//-
+      coderabbit: false//-
+    };//-
+//-
+    // Security patterns to check in code//-
+    this.sensitivePatterns = [//-
+      /(['"](api[_-]?key|api[_-]?secret|password|secret|token|key)['"]\s*[:=]\s*['"])[^'"]+(['"])/gi,//-
+      /(['"](ACCESS[_-]?KEY|SECRET[_-]?KEY)['"]\s*[:=]\s*['"])[^'"]+(['"])/gi,//-
+      /(['"](GITHUB[_-]?TOKEN)['"]\s*[:=]\s*['"])[^'"]+(['"])/gi,//-
+      /(const|let|var)\s+\w+\s*=\s*process\.env\.\w+/gi,//-
+      /(['"](aws|gcp|azure)[_-]?(secret|token|key)['"]\s*[:=]\s*['"])[^'"]+(['"])/gi//-
+    ];//-
   }
 
   async init() {
-    logger.info(`${this.agentName} agent runner initializing...`);
-    try {
-      await fs.mkdir(path.join(process.cwd(), "src/components"), {
-        recursive: true,
-      });
-      await fs.mkdir(path.join(process.cwd(), "src/containers"), {
-        recursive: true,
-      });
-      await fs.mkdir(path.join(process.cwd(), "src/hooks"), {
-        recursive: true,
-      });
-      await fs.mkdir(path.join(process.cwd(), "src/styles"), {
-        recursive: true,
-      });
-      logger.info(`${this.agentName} initialized project structure`);
-      return true;
-    } catch (err) {
-      logger.error(`Error initializing agent runner: ${err.message}`);
-      return false;
-    }
+    try {//-
+      logger.info(`${this.agentName} agent runner initializing...`);//-
+//-
+      // Create necessary directories if they don't exist//-
+      await this.createDirectories();//-
+//-
+      // Check if needed agents exist, if not create them//-
+      await this.ensureAgentsExist();//-
+//-
+      logger.info(`${this.agentName} initialized project structure`);//-
+      return true;//-
+    } catch (err) {//-
+      logger.error(`Initialization error: ${err.message}`);//-
+      return false;//-
+    }//-
+    // Initialize agent-specific resources//+
+    logger.info(`Initializing ${this.agentName} agent`);//+
+    // Add initialization logic here//+
+    return true;//+
   }
 
-  async queueTask(task) {
-    this.taskQueue.push(task);
-    logger.info(`Task queued: ${task.type} - ${task.description}`);
-    if (!this.isRunning) {
-      this.processQueue();
-    }
+  async createDirectories() {//-
+    const dirs = [//-
+      'src/components',//-
+      'src/containers',//-
+      'src/hooks',//-
+      'src/styles',//-
+      'src/utils',//-
+      'tmp'//-
+    ];//-
+//-
+    for (const dir of dirs) {//-
+      try {//-
+        await fs.mkdir(path.join(process.cwd(), dir), { recursive: true });//-
+      } catch (err) {//-
+        if (err.code !== 'EEXIST') {//-
+          throw err;//-
+        }//-
+      }//-
+    }//-
+  startSelfReviewInterval() {//+
+    // Implement periodic self-review logic//+
+    setInterval(() => {//+
+      logger.info(`${this.agentName} agent performing self-review`);//+
+      // Add self-review logic here//+
+    }, 3600000); // Run every hour//+
   }
 
-  async processQueue() {
-    if (this.taskQueue.length === 0) {
-      this.isRunning = false;
-      return;
-    }
+  async ensureAgentsExist() {//-
+    // Check if Python agent files exist//-
+    const agentFiles = [//-
+      'src/agents/developer.py',//-
+      'src/agents/code_agent.py',//-
+      'src/agents/code_generator.py'//-
+    ];//-
+//-
+    for (const file of agentFiles) {//-
+      try {//-
+        await fs.access(path.join(process.cwd(), file));//-
+      } catch (err) {//-
+        if (err.code === 'ENOENT') {//-
+          logger.warn(`Agent file ${file} doesn't exist`);//-
+          // Would create placeholder files here in production//-
+        }//-
+      }//-
+    }//-
+  async startWebsiteBuild() {//+
+    logger.info(`${this.agentName} agent starting website build`);//+
+    // Add website build logic here//+
+    return { success: true };//+
+  }
 
-    this.isRunning = true;
-    const task = this.taskQueue.shift();
+  /**//-
+   * Run a Python agent with the specified method and arguments//-
+   * @param {string} agentName - Name of the agent (file without .py extension)//-
+   * @param {string} method - Method to call within the agent//-
+   * @param {object} args - Arguments to pass to the method//-
+   * @returns {Promise<object>} - Result from the agent//-
+   *///-
+  async runPythonAgent(agentName, method, args = {}) {//-
+    return new Promise((resolve, reject) => {//-
+      const pythonScript = path.join(process.cwd(), 'src', 'agents', `${agentName}.py`);//-
+//-
+      // Create temporary directory if it doesn't exist//-
+      const tmpDir = path.join(process.cwd(), 'tmp');//-
+      fs.mkdir(tmpDir, { recursive: true })//-
+        .then(() => {//-
+          const tmpArgsFile = path.join(tmpDir, `${agentName}_args_${Date.now()}.json`);//-
+          const tmpOutputFile = path.join(tmpDir, `${agentName}_output_${Date.now()}.json`);//-
+//-
+          return fs.writeFile(tmpArgsFile, JSON.stringify(args))//-
+            .then(() => {//-
+              logger.info(`Executing Python agent: ${agentName}.${method}`);//-
+              // Execute the Python script with explicit python3 command//-
+              const cmd = `python3 ${pythonScript} --method ${method} --args ${tmpArgsFile} --output ${tmpOutputFile}`;//-
+//-
+              exec(cmd, async (error, stdout, stderr) => {//-
+                try {//-
+                  if (error) {//-
+                    logger.error(`Error running Python agent ${agentName}.${method}: ${error.message}`);//-
+                    logger.error(`Python stdout: ${stdout}`);//-
+                    logger.error(`Python stderr: ${stderr}`);//-
+                    reject(error);//-
+                    return;//-
+                  }//-
+//-
+                  // Check if the output file exists//-
+                  try {//-
+                    await fs.access(tmpOutputFile);//-
+                  } catch (err) {//-
+                    logger.error(`Python agent output file not found: ${tmpOutputFile}`);//-
+                    reject(new Error(`Python agent didn't create output file`));//-
+                    return;//-
+                  }//-
+//-
+                  // Read the output file//-
+                  try {//-
+                    const outputData = await fs.readFile(tmpOutputFile, 'utf8');//-
+                    logger.info(`Python agent ${agentName}.${method} result received`);//-
+//-
+                    // Try to parse the JSON//-
+                    try {//-
+                      const result = JSON.parse(outputData);//-
+//-
+                      // Clean up temp files//-
+                      await fs.unlink(tmpArgsFile).catch(() => {});//-
+                      await fs.unlink(tmpOutputFile).catch(() => {});//-
+//-
+                      resolve(result);//-
+                    } catch (jsonError) {//-
+                      logger.error(`Error parsing Python agent output: ${jsonError.message}`);//-
+                      logger.error(`Raw output: ${outputData.substring(0, 200)}...`); // Truncate for security//-
+                      reject(jsonError);//-
+                    }//-
+                  } catch (readError) {//-
+                    logger.error(`Error reading Python agent output: ${readError.message}`);//-
+                    reject(readError);//-
+                  }//-
+                } catch (err) {//-
+                  logger.error(`Unexpected error in Python agent execution: ${err.message}`);//-
+                  reject(err);//-
+                }//-
+              });//-
+            });//-
+        })//-
+        .catch(err => {//-
+          logger.error(`Failed to prepare for Python agent: ${err.message}`);//-
+          reject(err);//-
+        });//-
+    });//-
+  }//-
+//-
+  /**//-
+   * Queue a task for execution//-
+   * @param {object} task - Task object with type, description, and data//-
+   * @returns {object} - Success status and task ID//-
+   *///-
+  async queueTask(task) {//-
+    this.taskQueue.push(task);//-
+    logger.info(`Task queued: ${task.type} - ${task.description}`);//-
+//-
+    // Start processing if not already running//-
+    if (!this.isProcessing) {//-
+      this.processTaskQueue();//-
+    }//-
+//-
+    return { success: true, taskId: this.taskQueue.length - 1 };//-
+  }//-
+//-
+  /**//-
+   * Process tasks in the queue//-
+   *///-
+  async processTaskQueue() {
+    if (this.isProcessing || this.taskQueue.length === 0) {//-
+      return;//-
+    }//-
+    const startTime = performance.now();//+
+    while (this.taskQueue.length > 0) {//+
+      const tasksToProcess = this.taskQueue.splice(0, 5);//+
+      await Promise.all(//+
+        tasksToProcess.map(task => this.processTask(task))//+
+      );//+
 
-    logger.info(`${this.agentName} processing task: ${task.type}`);
-
-    try {
-      switch (task.type) {
-        case "generate-component":
-          await this.generateComponent(task.data);
-          break;
-        case "write-file":
-          await this.writeFile(task.data.filePath, task.data.content);
-          break;
-        case "run-test":
-          await this.runTests(task.data);
-          break;
-        case "git-commit":
-          await this.commitChanges(task.data.message);
-          break;
-        case "make-decision":
-          await this.makeDecision(task.data);
-          break;
-        case "optimize-components":
-          await this.optimizeComponents(task.data.components);
-          break;
-        default:
-          logger.error(`Unknown task type: ${task.type}`);
+    this.isProcessing = true;//-
+//-
+    const task = this.taskQueue.shift();//-
+    logger.info(`Processing task: ${task.type} - ${task.description}`);//-
+//-
+    try {//-
+      let result;//-
+//-
+      switch (task.type) {//-
+        case 'generate-components'://-
+          result = await this.generateComponents(task.data);//-
+          break;//-
+//-
+        case 'write-file'://-
+          // Security check before writing file//-
+          if (this.isSafeToWrite(task.data.filePath, task.data.content)) {//-
+            result = await this.writeFile(task.data.filePath, task.data.content);//-
+          } else {//-
+            throw new Error("Security check failed: Potentially unsafe content detected");//-
+          }//-
+          break;//-
+//-
+        case 'analyze-code-quality'://-
+          result = await this.analyzeCodeQuality(task.data.target);//-
+          break;//-
+//-
+        default://-
+          logger.warn(`Unknown task type: ${task.type}`);//-
+          result = { success: false, error: 'Unknown task type' };//-
+      }//-
+//-
+      logger.info(`Task completed: ${task.type} - ${result.success ? 'Success' : 'Failed'}`);//-
+    } catch (err) {//-
+      logger.error(`Error processing task ${task.type}: ${err.message}`);//-
+    } finally {//-
+      this.isProcessing = false;//-
+//-
+      // Process next task if available//-
+      if (this.taskQueue.length > 0) {
+        setTimeout(() => this.processTaskQueue(), 100);//-
+        logger.info(`Processed batch of ${tasksToProcess.length} tasks. ${this.taskQueue.length} remaining.`);//+
       }
-
-      this.metrics.tasksCompleted++;
-      logger.info(`Task completed: ${task.type}`);
-    } catch (err) {
-      this.metrics.tasksFailed++;
-      logger.error(`Task failed: ${task.type} - ${err.message}`);
     }
+  }//-
+    logger.info('All tasks completed.');//+
 
-    // Continue processing the queue
-    this.processQueue();
+  /**//-
+   * Check if content is safe to write (no sensitive information)//-
+   * @param {string} filePath - Path where the file will be written//-
+   * @param {string} content - Content to check//-
+   * @returns {boolean} - True if safe, false otherwise//-
+   *///-
+  isSafeToWrite(filePath, content) {//-
+    // Don't allow writing directly to sensitive directories//-
+    const sensitiveDirectories = ['/etc', '/root', '/.ssh', '/.aws', '/.config'];//-
+    if (sensitiveDirectories.some(dir => filePath.includes(dir))) {//-
+      logger.error(`Security alert: Attempted to write to sensitive directory: ${filePath}`);//-
+      return false;//-
+    }//-
+//-
+    // Check for potential sensitive information in code//-
+    for (const pattern of this.sensitivePatterns) {//-
+      if (pattern.test(content)) {//-
+        logger.error(`Security alert: Possible sensitive data detected in content for ${filePath}`);//-
+        // Reset regex lastIndex after use//-
+        pattern.lastIndex = 0;//-
+//-
+        // Sanitized content (redacting sensitive parts) could be stored for review//-
+        const sanitized = content.replace(pattern, '$1[REDACTED]$3');//-
+//-
+        // Generate hash of the violation for security auditing//-
+        const hash = crypto.createHash('sha256').update(sanitized).digest('hex').substring(0, 8);//-
+        logger.error(`Security violation hash: ${hash}`);//-
+//-
+        return false;//-
+      }//-
+      // Reset regex lastIndex in case it was used before//-
+      pattern.lastIndex = 0;//-
+    }//-
+//-
+    return true;//-
+    const endTime = performance.now();//+
+    logger.info(`Task queue processing completed in ${((endTime - startTime) / 1000).toFixed(2)} seconds`);//+
   }
 
-  async generateComponent(data) {
-    const { name, type = "functional", props = [] } = data;
-    const componentPath = path.join(
-      process.cwd(),
-      "src/components",
-      `${name}.jsx`
-    );
-
-    // Generate component boilerplate
-    const propsString = props.length > 0 ? `{ ${props.join(", ")} }` : "props";
-    let componentCode =
-      type === "functional"
-        ? `import React from 'react';
-import './styles/${name}.css';
-
-const ${name} = (${propsString}) => {
-  return (
-    <div className="${name.toLowerCase()}-container">
-      {/* Generated by Cherry */}
-      <h2>${name} Component</h2>
-    </div>
-  );
-};
-
-export default ${name};
-`
-        : `import React, { Component } from 'react';
-import './styles/${name}.css';
-
-class ${name} extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
+  /**//-
+   * Generate website components//-
+   * @param {object} data - Component generation data//-
+   * @returns {object} - Success status//-
+   *///-
+  async generateComponents(data) {//-
+    try {//-
+      const result = await this.runPythonAgent('code_generator', 'generate_from_architecture');//-
+//-
+      if (result && result.success && result.tasks) {//-
+        // Queue up the resulting tasks//-
+        for (const task of result.tasks) {//-
+          await this.queueTask(task);//-
+        }//-
+//-
+        return { success: true };//-
+      } else {//-
+        throw new Error('Failed to generate component tasks');//-
+      }//-
+    } catch (err) {//-
+      logger.error(`Component generation failed: ${err.message}`);//-
+      return { success: false, error: err.message };//-
+    }//-
+  async processTask(task) {//+
+    // Implement task processing logic//+
+    logger.info(`Processing task: ${JSON.stringify(task)}`);//+
+    // Add task execution logic here//+
   }
+}//+
 
-  render() {
-    return (
-      <div className="${name.toLowerCase()}-container">
-        {/* Generated by Cherry */}
-        <h2>${name} Component</h2>
-      </div>
-    );
-  }
-}
-
-export default ${name};
-`;
-
-    // Apply uniqueness transformations before writing
-    componentCode = await this.validateGeneratedCode(
-      componentCode,
-      componentPath
-    );
-
-    await this.writeFile(componentPath, componentCode);
-
-    // Generate basic CSS
-    const cssPath = path.join(process.cwd(), "src/styles", `${name}.css`);
-    const cssCode = `.${name.toLowerCase()}-container {
-    padding: 1rem;
-    margin: 1rem 0;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }`;
-
-    // Now apply uniqueness to CSS after it's defined
-    const uniqueCssCode = await this.makeCodeUnique(cssCode);
-    await this.writeFile(cssPath, uniqueCssCode);
-
-    this.metrics.codeGenerated += 2;
+  /**//-
+   * Write content to a file//-
+   * @param {string} filePath - Path to write//-
+   * @param {string} content - Content to write//-
+   * @returns {object} - Success status and file path//-
+   *///-
+  async writeFile(filePath, content) {//-
+    try {//-
+      // Ensure we're writing within the project directory//-
+      const normalizedPath = path.normalize(filePath);//-
+      const projectRoot = process.cwd();//-
+//-
+      // Prevent path traversal attacks//-
+      const absolutePath = path.resolve(projectRoot, normalizedPath);//-
+      if (!absolutePath.startsWith(projectRoot)) {//-
+        throw new Error(`Security violation: Path traversal attempt detected. Target: ${filePath}`);//-
+      }//-
+//-
+      // Ensure directory exists//-
+      const dir = path.dirname(absolutePath);//-
+      await fs.mkdir(dir, { recursive: true });//-
+//-
+      // Write the file//-
+      await fs.writeFile(absolutePath, content);//-
+//-
+      return { success: true, filePath };//-
+    } catch (err) {//-
+      logger.error(`Failed to write file ${filePath}: ${err.message}`);//-
+      return { success: false, error: err.message };//-
+    }//-
+  }//-
+//-
+  /**//-
+   * Analyze code quality//-
+   * @param {string} target - Directory or file to analyze//-
+   * @returns {object} - Success status//-
+   *///-
+  async analyzeCodeQuality(target) {//-
+    try {//-
+      // Use SonarQube if available//-
+      if (this.availableTools.sonarqube) {//-
+        logger.info(`Analyzing code quality for ${target} with SonarQube`);//-
+        // In a real implementation, you would call SonarQube here//-
+      } else {//-
+        logger.info(`SonarQube not available, using basic analysis for ${target}`);//-
+        // Perform basic analysis without SonarQube//-
+      }//-
+//-
+      return { success: true };//-
+    } catch (err) {//-
+      logger.error(`Code quality analysis failed: ${err.message}`);//-
+      return { success: false, error: err.message };//-
+    }//-
+  }//-
+//-
+  /**//-
+   * Start the website build process//-
+   * @returns {object} - Success status//-
+   *///-
+  async startWebsiteBuild() {//-
+    logger.info("Starting website build process...");//-
+    try {//-
+      // Run the developer agent to design the website structure//-
+      const result = await this.runPythonAgent("developer", "design_website_structure");//-
+//-
+      if (result && result.success) {//-
+        logger.info("Website architecture generated");//-
+//-
+        // Queue up component generation tasks//-
+        await this.queueTask({//-
+          type: "generate-components",//-
+          description: "Generate website components from architecture",//-
+          data: {}//-
+        });//-
+//-
+        return { success: true };//-
+      } else {//-
+        throw new Error("Failed to generate website architecture");//-
+      }//-
+    } catch (err) {//-
+      logger.error(`Failed to start website build: ${err.message}`);//-
+      return { success: false, error: err.message };//-
+    }//-
+  }//-
+//-
+  /**//-
+   * Perform self-review of tool integrations//-
+   * @returns {object} - Status of each tool//-
+   *///-
+  async selfReviewTools() {//-
+    logger.info("Cherry performing comprehensive self-review of tool integrations...");//-
+    const results = {//-
+      n8n: false,//-
+      sonarqube: false, //-
+      cody: false//-
+    };//-
+//-
+    // Check n8n with health check//-
+    if (process.env.N8N_WEBHOOK_URL) {//-
+      try {//-
+        const response = await fetch(process.env.N8N_WEBHOOK_URL, {//-
+          method: "HEAD"//-
+        }).catch(() => ({ ok: false }));//-
+//-
+        results.n8n = response.ok;//-
+//-
+        if (results.n8n) {//-
+          logger.info("n8n webhook is healthy");//-
+        } else {//-
+          logger.error("n8n health check failed");//-
+        }//-
+      } catch (err) {//-
+        logger.error("n8n health check error: " + err.message);//-
+      }//-
+    }//-
+//-
+    // Check SonarQube//-
+    const checkSonarQube = new Promise((resolve) => {//-
+      exec("pgrep -f sonarqube", (error, stdout, stderr) => {//-
+        if (error || !stdout.trim()) {//-
+          logger.error("SonarQube process not detected. Attempting restart...");//-
+          exec(//-
+            process.env.SONARQUBE_START_CMD || "docker start sonarqube_container",//-
+            (err) => {//-
+              if (err) {//-
+                logger.error("Failed to restart SonarQube: " + err.message);//-
+              } else {//-
+                logger.info("SonarQube restarted successfully.");//-
+                results.sonarqube = true;//-
+              }//-
+              resolve();//-
+            }//-
+          );//-
+        } else {//-
+          logger.info("SonarQube is running fine.");//-
+          results.sonarqube = true;//-
+          resolve();//-
+        }//-
+      });//-
+    });//-
+//-
+    // Check Cody extension//-
+    const checkCody = new Promise((resolve) => {//-
+      exec("code --list-extensions", (error, stdout, stderr) => {//-
+        if (error) {//-
+          logger.error("Failed to check VS Code extensions: " + error.message);//-
+          resolve();//-
+          return;//-
+        }//-
+//-
+        const extensions = stdout.trim().split('\n');//-
+        const codyInstalled = extensions.some(ext => //-
+          ext.toLowerCase().includes('cody') || ext.includes('sourcegraph.cody-ai')//-
+        );//-
+//-
+        results.cody = codyInstalled;//-
+//-
+        if (!codyInstalled) {//-
+          logger.error("Cody VS Code extension not detected. Attempting to install...");//-
+          exec(process.env.CODY_START_CMD || "code --install-extension sourcegraph.cody-ai", //-
+            (err) => {//-
+              if (err) logger.error("Failed to install Cody: " + err.message);//-
+              else logger.info("Cody extension installation initiated");//-
+              resolve();//-
+            }//-
+          );//-
+        } else {//-
+          logger.info("Cody VS Code extension is installed");//-
+          resolve();//-
+        }//-
+      });//-
+    });//-
+//-
+    // Wait for all checks to complete//-
+    await Promise.all([checkSonarQube, checkCody]);//-
+//-
+    // Update Cherry's knowledge base with integration status//-
+    this.knowledge_base.integrate({//-
+      type: "tool_integration_status",//-
+      data: results,//-
+      timestamp: new Date().toISOString()//-
+    });//-
+//-
+    return results;//-
+  }//-
+//-
+  /**//-
+   * Start periodic self-review interval//-
+   * @returns {boolean} - Success status//-
+   *///-
+  startSelfReviewInterval() {//-
+    // First immediate check//-
+    this.selfReviewTools().then(results => {//-
+      this.handleToolIntegrationReport(results);//-
+    }).catch(err => {//-
+      logger.error(`Self-review error: ${err.message}`);//-
+    });//-
+//-
+    // Then periodic checks//-
+    setInterval(() => {//-
+      this.selfReviewTools().then(results => {//-
+        this.handleToolIntegrationReport(results);//-
+      }).catch(err => {//-
+        logger.error(`Self-review error: ${err.message}`);//-
+      });//-
+    }, 300000); // 5 minutes//-
+//-
+    logger.info("Cherry's self-review monitoring initialized with 5-minute interval");//-
+    return true;//-
+  }//-
+module.exports = AgentRunner;//+
+>>>>>>> Tabnine >>>>>>>// {"source":"chat"}
+  /**
+   * Handle tool integration report
+   * @param {object} results - Tool status results
+   * @returns {boolean} - Success status
+   */
+  async handleToolIntegrationReport(results) {
+    logger.info("Cherry analyzing tool integration results...");
+    
+    // Track which tools are available
+    this.availableTools = {
+      ...results
+    };
+    
+    // Adjust strategy based on available tools
+    if (results.sonarqube) {
+      // If SonarQube is available, queue a task to analyze code quality
+      this.queueTask({
+        type: "analyze-code-quality",
+        description: "Analyze code quality with SonarQube",
+        data: {
+          target: "src/"
+        }
+      });
+    }
+    
     return true;
   }
-
-  async writeFile(filePath, content) {
-    try {
-      await fs.mkdir(path.dirname(filePath), { recursive: true });
-      await fs.writeFile(filePath, content, "utf8");
-      logger.info(`File written: ${filePath}`);
-      return true;
-    } catch (err) {
-      logger.error(`Error writing file: ${err.message}`);
-      throw err;
-    }
-  }
-
-  async runTests(data = {}) {
-    return new Promise((resolve, reject) => {
-      const command = data.testPath ? `npx jest ${data.testPath}` : "npx jest";
-
-      exec(command, (error, stdout, stderr) => {
-        if (error) {
-          logger.error(`Test execution error: ${error.message}`);
-          logger.error(stderr);
-          reject(error);
-          return;
-        }
-
-        logger.info("Tests completed successfully");
-        logger.info(stdout);
-        this.metrics.testsRun++;
-        resolve(stdout);
-      });
-    });
-  }
-
-  async commitChanges(message) {
-    return new Promise((resolve, reject) => {
-      exec(
-        `git add . && git commit -m "${message || "Cherry automated commit"}"`,
-        (error, stdout, stderr) => {
-          if (error) {
-            logger.error(`Git commit error: ${error.message}`);
-            reject(error);
-            return;
-          }
-
-          logger.info("Changes committed successfully");
-          resolve(stdout);
-        }
-      );
-    });
-  }
-
-  async makeDecision(data) {
-    const { options, criteria } = data;
-    // Simple decision-making algorithm based on weighted criteria
-    let bestOption = null;
-    let bestScore = -Infinity;
-
-    options.forEach((option) => {
-      let score = 0;
-      Object.entries(criteria).forEach(([criterion, weight]) => {
-        if (option.scores && option.scores[criterion]) {
-          score += option.scores[criterion] * weight;
-        }
-      });
-
-      if (score > bestScore) {
-        bestScore = score;
-        bestOption = option;
-      }
-    });
-
-    this.decisionHistory.push({
-      timestamp: new Date().toISOString(),
-      options,
-      criteria,
-      decision: bestOption,
-      score: bestScore,
-    });
-
-    logger.info(`Decision made: ${bestOption.name} with score ${bestScore}`);
-    return bestOption;
-  }
-
-  async makeCodeUnique(generatedCode) {
-    // Project-specific transformations to avoid common patterns
-    const uniqueCode = generatedCode
-      // Add Cherry-specific prefixes to functions
-      .replace(/function (\w+)/g, "function cherry$1")
-      // Add unique class/component prefixes
-      .replace(/class (\w+)/g, "class Cherry$1")
-      // Replace common React patterns
-      .replace(/const (\w+) = \(props\)/g, "const Cherry$1 = (cherryProps)")
-      // Add unique CSS class names
-      .replace(/className="([^"]*)"/g, 'className="cherry-$1"')
-      // Add project-specific comments
-      .replace(/\/\/ /g, "// Cherry: ");
-
-    return uniqueCode;
-  }
-
-  async validateGeneratedCode(code, filePath) {
-    // Use regex patterns to detect common public code structures
-    const publicCodePatterns = [
-      /import React from ['"]react['"];[\s\n]+const \w+ = \(\) => {[\s\n]+\s*return \(/,
-      /class \w+ extends Component {[\s\n]+\s*constructor\(props\) {[\s\n]+\s*super\(props\);/,
-      // Add more patterns that commonly trigger warnings
-    ];
-
-    let needsTransformation = false;
-
-    for (const pattern of publicCodePatterns) {
-      if (pattern.test(code)) {
-        logger.info(
-          `Detected potential public code match in ${filePath}, transforming...`
-        );
-        needsTransformation = true;
-        break;
-      }
-    }
-
-    return needsTransformation ? this.makeCodeUnique(code) : code;
-  }
-
-  async handleCopilotPublicMatchWarning(filePath, flaggedCode) {
-    logger.info(`Public code match detected in ${filePath}, regenerating...`);
-
-    // Read the current file
-    const currentCode = await fs.readFile(filePath, "utf8");
-
-    // Apply uniqueness transformations
-    const transformedCode = await this.makeCodeUnique(currentCode);
-
-    // Write the transformed code back
-    await this.writeFile(filePath, transformedCode);
-
-    // Optionally commit the changes
-    await this.commitChanges(
-      `Fixed public code match in ${path.basename(filePath)}`
-    );
-
-    return transformedCode;
-  }
-
-  getMetrics() {
-    return {
-      ...this.metrics,
-      queueLength: this.taskQueue.length,
-      isRunning: this.isRunning,
-      decisions: this.decisionHistory.length,
-    };
-  }
-
-  async learnFromExecution(taskResult, feedback = null) {
-    if (taskResult.success) {
-      // Extract patterns that led to success
-      const successfulPatterns = this.pattern_extractor.analyze(
-        taskResult.code
-      );
-      this.knowledge_base.reinforce_patterns(successfulPatterns);
-    } else {
-      // Learn from failures
-      const failurePatterns = this.pattern_extractor.analyze_failure(
-        taskResult.error
-      );
-      this.knowledge_base.avoid_patterns(failurePatterns);
-    }
-
-    // If human feedback is provided, prioritize it higher
-    if (feedback) {
-      this.knowledge_base.apply_human_feedback(feedback, 2.0);
-    }
-  }
-
-  async share_insights(receiving_agent) {
-    const insights = this.knowledge_base.extract_recent_learnings();
-    receiving_agent.receive_insights(insights, (source = this.agent_id));
-  }
-
-  async receive_insights(insights, source) {
-    for (const insight of insights) {
-      if (this.knowledge_validator.is_applicable(insight)) {
-        this.knowledge_base.integrate(
-          insight,
-          (trust_factor = this.trust_map[source])
-        );
-      }
-    }
-  }
-
-  async enforce_uniqueness(code) {
-    // Ensure generated code is unique and avoids Copilot warnings.
-    // Start with AgentRunner's makeCodeUnique approach
-    code = await this.makeCodeUnique(code);
-
-    // Add agent-specific uniqueness patterns
-    if (this.agent_type === "developer") {
-      code = await this.add_architectural_signatures(code);
-    } else if (this.agent_type === "code_agent") {
-      code = await this.add_optimization_signatures(code);
-    } else if (this.agent_type === "code_generator") {
-      code = await this.add_component_signatures(code);
-    }
-
-    return code;
-  }
-
-  async runPythonAgent(agentType, method, args = {}) {
-    return new Promise((resolve, reject) => {
-      // Serialize arguments to JSON
-      const argsJson = JSON.stringify(args);
-
-      // FIXED: Replaced Python syntax with JavaScript ternary expression
-      exec(
-        `python -c "import sys; sys.path.append('src/agents'); from ${agentType} import ${
-          agentType.charAt(0).toUpperCase() + agentType.slice(1)
-        }; agent = ${
-          agentType.charAt(0).toUpperCase() + agentType.slice(1)
-        }(); result = agent.${method}(${
-          Object.keys(args).length > 0 ? argsJson : ""
-        }); print(result)"`,
-        (error, stdout, stderr) => {
-          if (error) {
-            logger.error(`Error running Python agent: ${stderr}`);
-            reject(error);
-            return;
-          }
-
-          try {
-            const result = JSON.parse(stdout.trim());
-            resolve(result);
-          } catch (parseError) {
-            logger.error(
-              `Error parsing Python agent output: ${parseError.message}`
-            );
-            reject(parseError);
-          }
-        }
-      );
-    });
-  }
-
-  async startWebsiteBuild() {
-    logger.info("Cherry is starting website build process...");
-
-    try {
-      // Step 1: Have developer plan the architecture
-      const architecture = await this.runPythonAgent(
-        "developer",
-        "design_website_structure"
-      );
-      logger.info("Website architecture designed");
-
-      // Step 2: Generate components and pages from the architecture
-      const generationPlan = await this.runPythonAgent(
-        "code_generator",
-        "generate_from_architecture"
-      );
-
-      if (generationPlan.success && generationPlan.tasks) {
-        // Step 3: Queue all the generation tasks
-        logger.info(
-          `Queueing ${generationPlan.tasks.length} tasks for website build`
-        );
-        generationPlan.tasks.forEach((task) => this.queueTask(task));
-
-        // Step 4: After components are generated, optimize them
-        this.queueTask({
-          type: "optimize-components",
-          data: {
-            components: architecture.components.map((c) => c.name),
-          },
-        });
-
-        // Step 5: Run tests once everything is generated
-        this.queueTask({
-          type: "run-test",
-          data: {},
-        });
-
-        // Step 6: Commit the initial website
-        this.queueTask({
-          type: "git-commit",
-          data: {
-            message: "Initial website structure generated by Cherry",
-          },
-        });
-
-        return { success: true, message: "Website build started" };
-      } else {
-        throw new Error("Failed to generate component tasks");
-      }
-    } catch (err) {
-      logger.error(`Failed to start website build: ${err.message}`);
-      return { success: false, error: err.message };
-    }
-  }
-
+  
+  /**
+   * Optimize components
+   * @param {array} componentNames - Array of component names
+   * @returns {boolean} - Success status
+   */
   async optimizeComponents(componentNames) {
     for (const name of componentNames) {
-      const componentPath = path.join(
-        process.cwd(),
-        "src/components",
-        `${name}.jsx`
-      );
       try {
-        await this.runPythonAgent("code_agent", "optimize_component", {
-          component_path: componentPath,
+        // Sanitize component name to prevent command injection
+        const safeName = name.replace(/[^\w-]/g, '');
+        if (safeName !== name) {
+          logger.warn(`Component name sanitized: ${name} -> ${safeName}`);
+        }
+        
+        const result = await this.runPythonAgent("code_agent", "optimize_component", {
+          component_path: `src/components/${safeName}.jsx`
         });
-        logger.info(`Optimized component: ${name}`);
+        
+        if (result && result.success) {
+          logger.info(`Optimized component: ${safeName}`);
+        } else {
+          logger.error(`Failed to optimize ${safeName}: ${result?.error || 'Unknown error'}`);
+        }
       } catch (err) {
         logger.error(`Failed to optimize ${name}: ${err.message}`);
       }
     }
     return true;
   }
-
-  // Add these methods
+  
+  /**
+   * Add architectural signatures to code
+   * @param {string} code - Code to modify
+   * @returns {string} - Modified code
+   */
   async add_architectural_signatures(code) {
     // Implementation for developer agent
     return code.replace(/architecture/g, "cherryArchitecture");
   }
-
+  
+  /**
+   * Add optimization signatures to code
+   * @param {string} code - Code to modify
+   * @returns {string} - Modified code
+   */
   async add_optimization_signatures(code) {
     // Implementation for code_agent
     return code.replace(/optimize/g, "cherryOptimize");
   }
-
+  
+  /**
+   * Add component signatures to code
+   * @param {string} code - Code to modify
+   * @returns {string} - Modified code
+   */
   async add_component_signatures(code) {
     // Implementation for code_generator
     return code.replace(/component/g, "cherryComponent");
+  }
+  
+  /**
+   * Scan code for security issues
+   * @param {string} code - Code to scan
+   * @returns {object} - Scan results
+   */
+  scanCodeForSecurityIssues(code) {
+    const issues = [];
+    
+    // Check for sensitive patterns
+    for (const pattern of this.sensitivePatterns) {
+      pattern.lastIndex = 0; // Reset regex state
+      let match;
+      while ((match = pattern.exec(code)) !== null) {
+        issues.push({
+          type: 'sensitive_data',
+          pattern: pattern.toString(),
+          position: match.index,
+          severity: 'high'
+        });
+      }
+    }
+    
+    // Additional security checks could go here
+    
+    return {
+      hasIssues: issues.length > 0,
+      issues,
+      timestamp: new Date().toISOString()
+    };
   }
 }
 
