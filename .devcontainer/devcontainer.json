@@ -29,7 +29,8 @@
         "sonarsource.sonarlint-vscode",
         "bradlc.vscode-tailwindcss",
         "dsznajder.es7-react-js-snippets",
-        "eamodio.gitlens"
+        "eamodio.gitlens",
+        "TabNine.tabnine-vscode"
       ],
       "settings": {
         "github.copilot.enable": {
@@ -62,6 +63,11 @@
       "copilot": {
         "enabled": true
       }
+    },
+    "codespaces": {
+      "env": {
+        "SOURCECODE_API_KEY": "${{ secrets.SOURCECODE_API_KEY }}"
+      }
     }
   },
   "features": {
@@ -72,7 +78,6 @@
     "ghcr.io/devcontainers-contrib/features/jest:2": {}
   },
   "initializeCommand": "mkdir -p .vscode",
-  "postCreateCommand": "npm install && if [ -f requirements.txt ]; then pip install -r requirements.txt; fi && pip install pylint pytest && npm install -g madge",
+  "postCreateCommand": "/workspaces/your-repo/setup_cody.sh",
   "postStartCommand": "git config --global pull.rebase true && echo 'Extensions installed. Sourcegraph, SonarLint, and GitHub Copilot are ready to use.' > /dev/null"
 }
-

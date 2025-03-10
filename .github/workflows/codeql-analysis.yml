@@ -1,12 +1,12 @@
-name: "CodeQL Analysis with Copilot Autofix"
+name: "CodeQL"
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
   schedule:
-    - cron: '0 0 * * 0'  # Run once a week at midnight on Sunday
+    - cron: '0 0 * * 0'
 
 jobs:
   analyze:
@@ -16,26 +16,45 @@ jobs:
       actions: read
       contents: read
       security-events: write
-      pull-requests: write  # Required for Copilot Autofix to create PRs
 
     strategy:
       fail-fast: false
       matrix:
-        language: [ 'javascript', 'python' ]  # Adjust languages as needed
+        language: [ 'javascript' ]
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v1
+      uses: github/codeql-action/init@v2
       with:
         languages: ${{ matrix.language }}
 
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v1
-
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
-      with:
-        category: "/language:${{ matrix.language }}"
+      uses: github/codeql-action/analyze@v2
+
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "npm"
+    commit-message:
+      prefix: "npm"
+      include: "scope"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "github-actions"

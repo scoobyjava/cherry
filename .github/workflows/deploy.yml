@@ -1,0 +1,23 @@
+name: Deploy Application
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Deploy to Railway
+        uses: railwayapp/railway-github-action@v1.0.0
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        with:
+          command: up
+          
+      - name: Zilliz Database Setup
+        env: 
+          ZILLIZ_API_KEY: ${{ secrets.ZILLIZ_API_KEY }}
+        run: node scripts/setup-vector-db.js

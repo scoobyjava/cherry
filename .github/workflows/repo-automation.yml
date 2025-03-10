@@ -1,0 +1,20 @@
+name: Repository Automation
+
+on:
+  issues:
+    types: [opened, edited]
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  auto-label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Run Repository Automation
+        env:
+          CHERRY_GH_TOKEN: ${{ secrets.CHERRY_GH_TOKEN }}
+          CHERRY_GH_REPO: ${{ secrets.CHERRY_GH_REPO }}
+          CODERABBIT_API_KEY: ${{ secrets.CODERABBIT_API_KEY }}
+        run: node scripts/repo-automation.js

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cherry Blossom Command Center</title>
+  <link rel="stylesheet" href="/cherry-dashboard/styles.css">
+</head>
+<body>
+  <div class="dashboard-container">
+    <header>
+      <div class="logo">
+        <img src="/cherry-dashboard/assets/cherry-logo.svg" alt="Cherry Logo">
+        <h1>Cherry Blossom Command Center</h1>
+      </div>
+      <div class="user-controls">
+        <button id="settings-button">Settings</button>
+        <button id="help-button">Help</button>
+      </div>
+    </header>
+
+    <nav class="sidebar">
+      <div class="nav-item active" data-target="terminal-section">Command Terminal</div>
+      <div class="nav-item" data-target="agents-section">Agent Status</div>
+      <div class="nav-item" data-target="memory-section">Memory Explorer</div>
+      <div class="nav-item" data-target="projects-section">Project Management</div>
+      <div class="nav-item" data-target="history-section">Conversation History</div>
+    </nav>
+
+    <main class="content">
+      <!-- Terminal Section -->
+      <section id="terminal-section" class="active">
+        <h2>Command Terminal</h2>
+        <div id="terminal-output" class="terminal-output"></div>
+        <div class="terminal-input-container">
+          <span class="prompt">cherry></span>
+          <input type="text" id="terminal-input" placeholder="Type a command..." autofocus>
+        </div>
+      </section>
+
+      <!-- Agent Status Section -->
+      <section id="agents-section">
+        <h2>Agent Status Dashboard</h2>
+        <div id="system-status" class="status-overview">
+          <div class="status-card">
+            <h3>System Status</h3>
+            <div id="connection-status">Initializing</div>
+          </div>
+        </div>
+        <div id="agent-statuses" class="agent-grid"></div>
+      </section>
+      
+      <!-- Memory Explorer Section -->
+      <section id="memory-section">
+        <h2>Memory Explorer</h2>
+        <div class="search-container">
+          <input type="text" id="memory-search" placeholder="Search Cherry's memory...">
+        </div>
+        <div id="search-results" class="results-container"></div>
+      </section>
+      
+      <!-- Projects Section -->
+      <section id="projects-section">
+        <h2>Project Management</h2>
+        <div class="project-controls">
+          <button id="new-project-btn">New Project</button>
+          <select id="project-filter">
+            <option value="all">All Projects</option>
+            <option value="active">Active</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+        <div id="project-container" class="projects-grid"></div>
+      </section>
+      
+      <!-- Conversation History Section -->
+      <section id="history-section">
+        <h2>Conversation History</h2>
+        <div id="conversation-history" class="history-container"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="/cherry-dashboard/script.js"></script>
+</body>
+</html>

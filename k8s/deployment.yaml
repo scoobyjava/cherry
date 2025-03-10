@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cherry-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: cherry
+  template:
+    metadata:
+      labels:
+        app: cherry
+    spec:
+      containers:
+      - name: cherry
+        image: your-dockerhub-username/cherry:latest
+        imagePullPolicy: Always
+        env:
+        - name: WEBHOOK_PORT
+          value: "3001"
+        - name: HUGGINGFACE_API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: huggingface-secret
+              key: token
+        ports:
+        - containerPort: 3001
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cherry-service
+spec:
+  selector:
+    app: cherry
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3001
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: cherry-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: cherry-deployment
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70

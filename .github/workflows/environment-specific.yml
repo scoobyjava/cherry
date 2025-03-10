@@ -1,0 +1,24 @@
+name: Deploy to Environment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Deploy with environment-specific secrets
+        env:
+          API_KEY: ${{ secrets.OPENAI_API_KEY }}  # Different values in different environments
+        run: ./deploy.sh

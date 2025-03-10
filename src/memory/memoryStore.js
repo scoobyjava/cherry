@@ -43,22 +43,18 @@ class MemoryStore {
    * @returns {string} The unique id of the entry.
    */
   addEntry(entry) {
-    // Assign a unique id and timestamp to the entry.
     entry.id = Date.now() + '-' + Math.random().toString(36).substr(2, 9);
     entry.timestamp = new Date().toISOString();
-
-    // Persist the entry in short-term memory.
     this.memory.shortTerm.push(entry);
 
-    // Check whether we have exceeded our threshold.
+    logger.info("Added new memory entry", { id: entry.id, type: entry.type });
+
     if (this.memory.shortTerm.length > this.maxEntries) {
       this.summarizeShortTerm();
     }
-
     saveMemory(this.memory);
     return entry.id;
   }
-
   /**
    * Retrieves memory entries (from both short-term and long-term) matching the filter function.
    * @param {Function} filterFn - A function that returns a boolean (entry) => boolean.

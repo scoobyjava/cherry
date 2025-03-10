@@ -1,0 +1,13 @@
+{
+  "searchContexts": [...],
+  "codebase": {
+    "indexing": {
+      "enabled": true,
+      "excludePaths": ["node_modules/**"]
+    }
+  },
+  "autocomplete": {
+    "enabled": true,
+    "model": "anthropic/claude-3-opus-20240229"
+  }
+}
