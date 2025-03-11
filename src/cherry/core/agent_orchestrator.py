@@ -139,8 +139,9 @@ class AgentOrchestrator:
                     # Execute directly
                     return await self._execute_task_directly(agent_name, params, cache_key)
     
-    async def _execute_task_directly(self, agent_name: str, params: Dict[str, Any], 
-                                    cache_key: Optional[str] = None) -> Any:
+    async def _execute_task_directly(
+            self, agent_name: str, params: Dict[str, Any], 
+            cache_key: Optional[str] = None) -> Any:
         """Internal method to execute a task directly."""
         agent = self.agents[agent_name]
         task_id = f"{agent_name}-{uuid.uuid4()}"
@@ -190,20 +191,9 @@ class AgentOrchestrator:
         finally:
             # Update execution time stats
             execution_time = time.time() - start_time
-            agent_execution_time.record(execution_time, {"agent": agent_name})
-            
-            agent.avg_execution_time = (
-                (agent.avg_execution_time * (agent.success_count + agent.error_count - 1) + execution_time) /
-                (agent.success_count + agent.error_count)
-            )
-            
-            # Clean up
-            agent.status = "idle"
-            self.active_tasks.remove(task_id)
-            
-            # Process next pending task if any
-            await self._process_next_pending_task()
-    
+            logger.info(f"Agent {agent_name} execution time: {execution_time:.2f}s")
+            # Remove the task from active tasks to prevent buildup
+            self.active_tasks.remove(task_id)    
     async def _process_next_pending_task(self) -> None:
         """Process the next task in the pending queue."""
         async with self.lock:

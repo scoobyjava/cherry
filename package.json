@@ -10,7 +10,10 @@
     "sonar:stop": "docker-compose down",
     "sonar": "sonar-scanner",
     "install-dependencies": "npm install && docker-compose pull",
-    "test": "jest --coverage"
+    "test": "jest --coverage",
+    "build": "cherry build",
+    "build:mobile": "cherry build && npx cap copy",
+    "dev": "nodemon --exec 'npm run build && npx cap sync' --ext js,ts,jsx,tsx,css,html"
   },
   "author": "Your Name",
   "license": "MIT",
@@ -19,11 +22,15 @@
     "@babel/core": "^7.26.9",
     "@babel/preset-env": "^7.26.9",
     "@babel/preset-react": "^7.26.3",
+    "@testing-library/react-native": "^13.2.0",
+    "detox": "^20.34.4",
     "eslint": "^9.22.0",
-    "jest": "^29.5.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.9",
     "sonarqube-scanner": "^3.0.0"
   },
   "dependencies": {
+    "@capacitor/storage": "^1.2.5",
     "@elastic/elasticsearch": "^8.17.1",
     "axios": "^1.8.2",
     "body-parser": "^1.20.3",

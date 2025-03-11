@@ -1,28 +1,69 @@
-import { ConfigLoader } from './config/config_loader';
-import * as path from 'path';
+const express = require("express");
+const path = require("path");
+const http = require("http");
+const socketIo = require("socket.io");
+const { debugRouter, setupErrorHandlers } = require("./utils/debugTeam");
+const { ConfigLoader } = require("./config/config_loader");
+const agentRouter = require("./api/agentRouter");
 
-async function main() {
+const app = express();
+const server = http.createServer(app);
+const io = socketIo(server);
+const PORT = process.env.PORT || 3000;
+
+// Setup middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
+
+// Set up API routes
+app.use("/api/debug", debugRouter);
+app.use("/api/cherry", agentRouter);
+
+// Dashboard route
+app.get("/dashboard", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "dashboard.html"));
+});
+
+// Setup WebSocket for real-time agent communication
+io.on("connection", (socket) => {
+  console.log("New client connected");
+  
+  socket.on("join-agent-channel", (agentId) => {
+    socket.join(`agent-${agentId}`);
+  });
+  
+  socket.on("join-swarm", (swarmId) => {
+    socket.join(`swarm-${swarmId}`);
+  });
+  
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
+  });
+});
+
+// Set up error handlers
+setupErrorHandlers();
+
+// Initialize configuration
+async function initializeApp() {
   try {
-    // Load configuration with secrets resolved
+    // Load configuration
     const config = await ConfigLoader.loadConfig(
-      path.join(__dirname, '../benchmarks/benchmark_config.json')
+      path.join(__dirname, "../config/app_config.json")
     );
-    
-    console.log('Configuration loaded with secure secrets');
-    
-    // Use configuration (safely log non-sensitive parts only)
-    console.log('Pinecone Environment:', config.pinecone.environment);
-    console.log('Postgres Host:', config.postgres.host);
-    console.log('OpenAI Default Model:', config.openai?.default_model);
-    
-    // Now you can use the configuration with resolved secrets
-    // Example: initialize clients with secure API keys
-    
+
+    // Start server
+    server.listen(PORT, () => {
+      console.log(`Cherry server running on port ${PORT}`);
+    });
   } catch (error) {
-    console.error('Failed to load configuration:', error);
+    console.error("Failed to initialize app:", error);
     process.exit(1);
   }
 }
 
-// Run the application
-main().catch(console.error);
+// Initialize the application
+initializeApp().catch(console.error);
+
+module.exports = { app, server, io };

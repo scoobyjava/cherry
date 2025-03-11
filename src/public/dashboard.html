@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cherry AI Dashboard</title>
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body class="dark-theme">
+  <div class="sidebar">
+    <div class="logo">
+      <img src="/images/cherry-logo.svg" alt="Cherry AI Logo">
+      <h1>Cherry AI</h1>
+    </div>
+    <nav>
+      <ul>
+        <li class="active"><a href="#overview">Overview</a></li>
+        <li><a href="#agents">Agent Network</a></li>
+        <li><a href="#chat">Chat Interface</a></li>
+        <li><a href="#files">File Manager</a></li>
+        <li><a href="#debug">Debug Reports</a></li>
+        <li><a href="#settings">Settings</a></li>
+      </ul>
+    </nav>
+  </div>
+  
+  <main>
+    <header>
+      <div class="search">
+        <input type="text" placeholder="Search...">
+      </div>
+      <div class="user-menu">
+        <span class="username">Admin</span>
+        <img src="/images/user-avatar.png" alt="User Avatar">
+      </div>
+    </header>
+    
+    <div class="content-area">
+      <section id="overview" class="active">
+        <h2>System Overview</h2>
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <h3>System Load</h3>
+            <div class="metric-value" id="system-load">78%</div>
+            <div class="metric-chart" id="load-chart"></div>
+          </div>
+          <div class="metric-card">
+            <h3>Active Agents</h3>
+            <div class="metric-value" id="active-agents">5/5</div>
+            <div class="agent-list" id="quick-agent-list"></div>
+          </div>
+          <div class="metric-card">
+            <h3>Memory Usage</h3>
+            <div class="metric-value" id="memory-usage">3.2 GB</div>
+            <div class="metric-chart" id="memory-chart"></div>
+          </div>
+          <div class="metric-card">
+            <h3>Recent Activity</h3>
+            <div class="activity-feed" id="recent-activity"></div>
+          </div>
+        </div>
+      </section>
+      
+      <section id="agents">
+        <h2>Agent Network</h2>
+        <div class="agent-grid" id="agent-grid"></div>
+        <div class="agent-performance" id="agent-performance"></div>
+      </section>
+      
+      <!-- Additional sections to be implemented -->
+    </div>
+  </main>
+  
+  <script src="/js/dashboard.js"></script>
+  <script src="/js/charts.js"></script>
+</body>
+</html>

@@ -2,7 +2,7 @@ const express = require('express');
 const http = require('http');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const OrchestratorBridge = require('../agent_system/orchestrator_bridge');
+const { OrchestratorBridge } = require('../agent_system/orchestrator_bridge');
 
 // Load environment variables
 dotenv.config();

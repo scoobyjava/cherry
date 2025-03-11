@@ -1,0 +1,5 @@
+{
+  "appId": "com.example.yourapp",
+  "appName": "YourAppName",
+  "webDir": "npx cap add ios"
+}

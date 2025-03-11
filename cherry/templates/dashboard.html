@@ -1,23 +1,65 @@
+<<<<<<< Tabnine <<<<<<<
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">//+
     <title>Cherry Dashboard</title>
-    <style>
-        /* Simple styling for cards and leaderboard */
-        .card { border: 1px solid #ccc; padding: 10px; margin: 10px; display: inline-block; }
-        .leaderboard { margin-top: 20px; }
-    </style>
+    <style>//-
+        /* Simple styling for cards and leaderboard *///-
+        .card { border: 1px solid #ccc; padding: 10px; margin: 10px; display: inline-block; }//-
+        .leaderboard { margin-top: 20px; }//-
+    </style>//-
+    <link rel="stylesheet" href="/static/css/tailwind.min.css">//+
+    <link rel="stylesheet" href="/static/css/dashboard.css">//+
 </head>
-<body>
-    <h1>Cherry Task Dashboard</h1>
-    <div id="tasks"></div>
-    <div class="leaderboard">
-        <h2>Agent Leaderboard</h2>
-        <div id="leaderboard"></div>
-    </div>
-    <div id="announcement" style="margin-top: 20px; color: red;"></div>
+<body>//-
+    <h1>Cherry Task Dashboard</h1>//-
+    <div id="tasks"></div>//-
+    <div class="leaderboard">//-
+        <h2>Agent Leaderboard</h2>//-
+        <div id="leaderboard"></div>//-
+    </div>//-
+    <div id="announcement" style="margin-top: 20px; color: red;"></div>//-
+<body class="bg-gray-900 text-white">//+
+    <header class="bg-gray-800 shadow-md">//+
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">//+
+            <h1 class="text-2xl font-bold text-red-400">Cherry Task Dashboard</h1>//+
+            <nav>//+
+                <ul class="flex space-x-4">//+
+                    <li><a href="/" class="hover:text-red-400 transition">Home</a></li>//+
+                    <li><a href="/chat" class="hover:text-red-400 transition">Chat</a></li>//+
+                    <li><a href="/settings" class="hover:text-red-400 transition">Settings</a></li>//+
+                </ul>//+
+            </nav>//+
+        </div>//+
+    </header>//+
 
+    <main class="container mx-auto px-4 py-8">//+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">//+
+            <!-- Task Section -->//+
+            <section class="bg-gray-800 rounded-lg shadow-lg p-6">//+
+                <h2 class="text-xl font-semibold mb-4 text-red-400">Active Tasks</h2>//+
+                <div id="tasks" class="space-y-4"></div>//+
+            </section>//+
+//+
+            <!-- Leaderboard Section -->//+
+            <section class="bg-gray-800 rounded-lg shadow-lg p-6">//+
+                <h2 class="text-xl font-semibold mb-4 text-red-400">Agent Leaderboard</h2>//+
+                <div id="leaderboard" class="space-y-2"></div>//+
+            </section>//+
+        </div>//+
+//+
+        <!-- Agent Network Visualization -->//+
+        <section class="mt-8 bg-gray-800 rounded-lg shadow-lg p-6">//+
+            <h2 class="text-xl font-semibold mb-4 text-red-400">Agent Communication Network</h2>//+
+            <div id="network-visualization" class="h-80 bg-gray-900 rounded-lg flex items-center justify-center">//+
+                <p class="text-gray-400">Loading visualization...</p>//+
+            </div>//+
+        </section>//+
+//+
+        <div id="announcement" class="mt-6 p-4 bg-red-900 bg-opacity-50 rounded-lg hidden"></div>//+
+    </main>//+
     <script>
         async function fetchData(url) {
             const response = await fetch(url);
@@ -25,46 +67,111 @@
         }
 
         async function renderDashboard() {
-            const tasks = await fetchData('/api/tasks');
-            const leaderboard = await fetchData('/api/leaderboard');
+            const tasks = await fetchData('/api/tasks');//-
+            const leaderboard = await fetchData('/api/leaderboard');//-
+            try {//+
+                const tasks = await fetchData('/api/tasks');//+
+                const leaderboard = await fetchData('/api/leaderboard');//+
+                const networkData = await fetchData('/api/agent-network');//+
 
-            // Render task cards
-            const tasksDiv = document.getElementById('tasks');
-            tasksDiv.innerHTML = '';
-            tasks.forEach(task => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `<h3>${task.title}</h3><p>Status: ${task.status}</p>`;
-                tasksDiv.appendChild(card);
-            });
+            // Render task cards//-
+            const tasksDiv = document.getElementById('tasks');//-
+            tasksDiv.innerHTML = '';//-
+            tasks.forEach(task => {//-
+                const card = document.createElement('div');//-
+                card.className = 'card';//-
+                card.innerHTML = `<h3>${task.title}</h3><p>Status: ${task.status}</p>`;//-
+                tasksDiv.appendChild(card);//-
+            });//-
+                // Render task cards//+
+                const tasksDiv = document.getElementById('tasks');//+
+                tasksDiv.innerHTML = '';//+
+                tasks.forEach(task => {//+
+                    const statusColor = getStatusColor(task.status);//+
+                    const card = document.createElement('div');//+
+                    card.className = 'bg-gray-700 rounded-md p-4 shadow transition hover:shadow-md';//+
+                    card.innerHTML = `//+
+                        <h3 class="font-medium">${task.title}</h3>//+
+                        <div class="flex justify-between items-center mt-2">//+
+                            <span class="text-sm ${statusColor}">${task.status}</span>//+
+                            <span class="text-xs text-gray-400">${formatTime(task.updated_at)}</span>//+
+                        </div>//+
+                    `;//+
+                    tasksDiv.appendChild(card);//+
+                });//+
 
-            // Render leaderboard
-            const leaderboardDiv = document.getElementById('leaderboard');
-            leaderboardDiv.innerHTML = '';
-            leaderboard.forEach(entry => {
-                const entryDiv = document.createElement('div');
-                entryDiv.innerHTML = `<strong>${entry.agent}</strong> - Tasks: ${entry.tasks_completed}, Avg Time: ${entry.avg_time} hrs`;
-                leaderboardDiv.appendChild(entryDiv);
-            });
+            // Render leaderboard//-
+            const leaderboardDiv = document.getElementById('leaderboard');//-
+            leaderboardDiv.innerHTML = '';//-
+            leaderboard.forEach(entry => {//-
+                const entryDiv = document.createElement('div');//-
+                entryDiv.innerHTML = `<strong>${entry.agent}</strong> - Tasks: ${entry.tasks_completed}, Avg Time: ${entry.avg_time} hrs`;//-
+                leaderboardDiv.appendChild(entryDiv);//-
+            });//-
+        }//-
+                // Render leaderboard//+
+                const leaderboardDiv = document.getElementById('leaderboard');//+
+                leaderboardDiv.innerHTML = '';//+
+                leaderboard.forEach((agent, index) => {//+
+                    const item = document.createElement('div');//+
+                    item.className = 'flex justify-between items-center p-2 bg-gray-700 rounded';//+
+                    item.innerHTML = `//+
+                        <div class="flex items-center">//+
+                            <span class="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center mr-3">${index + 1}</span>//+
+                            <span>${agent.name}</span>//+
+                        </div>//+
+                        <span class="font-medium">${agent.score}</span>//+
+                    `;//+
+                    leaderboardDiv.appendChild(item);//+
+                });//+
+
+        // Simulate fun event announcement//-
+        function announceStreak(message) {//-
+            document.getElementById('announcement').textContent = message;//-
+                // Load network visualization if available//+
+                if (networkData && networkData.image_url) {//+
+                    const vizContainer = document.getElementById('network-visualization');//+
+                    vizContainer.innerHTML = `<img src="${networkData.image_url}" alt="Agent Network" class="max-h-full mx-auto">`;//+
+                }//+
+//+
+                // Check for announcements//+
+                if (tasks.some(task => task.priority === 'critical')) {//+
+                    const announcement = document.getElementById('announcement');//+
+                    announcement.textContent = "Critical tasks require attention!";//+
+                    announcement.classList.remove('hidden');//+
+                }//+
+            } catch (error) {//+
+                console.error("Error rendering dashboard:", error);//+
+            }//+
         }
 
-        // Simulate fun event announcement
-        function announceStreak(message) {
-            document.getElementById('announcement').textContent = message;
-        }
-
-        // Example: trigger announcement if a streak is detected (replace with real detection)
-        function checkTaskStreak() {
-            // Dummy condition: if agent "Alice" has completed >= 3 tasks in a row without delegate delays
-            // In reality, this would be triggered by backend logic.
-            let streakDetected = true; // For demonstration
-            if (streakDetected) {
-                announceStreak("Cherry announces: Agent Alice just completed 3 tasks in a row without delegate delays!");
+        // Example: trigger announcement if a streak is detected (replace with real detection)//-
+        function checkTaskStreak() {//-
+            // Dummy condition: if agent "Alice" has completed >= 3 tasks in a row without delegate delays//-
+            // In reality, this would be triggered by backend logic.//-
+            let streakDetected = true; // For demonstration//-
+            if (streakDetected) {//-
+                announceStreak("Cherry announces: Agent Alice just completed 3 tasks in a row without delegate delays!");//-
+        function getStatusColor(status) {//+
+            switch(status.toLowerCase()) {//+
+                case 'completed': return 'text-green-400';//+
+                case 'in progress': return 'text-blue-400';//+
+                case 'failed': return 'text-red-400';//+
+                default: return 'text-gray-400';//+
             }
         }
 
+        function formatTime(timestamp) {//+
+            return new Date(timestamp).toLocaleTimeString();//+
+        }//+
+//+
+        // Initial render//+
         renderDashboard();
-        checkTaskStreak();
+        checkTaskStreak();//-
+//+
+        // Refresh every 30 seconds//+
+        setInterval(renderDashboard, 30000);//+
     </script>
 </body>
 </html>
+>>>>>>> Tabnine >>>>>>>// {"source":"chat"}

@@ -176,6 +176,7 @@ def scan_security(code: str) -> List[str]:
         for match in pattern.finditer(code):
             # Find the line number
             line_num = code[:match.start()].count('\n') + 1
+            import pdb; pdb.set_trace()  # Breakpoint here
             issues.append(f"Line {line_num}: {message}")
     
     # Additional heuristic checks that require more context

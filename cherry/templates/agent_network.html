@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agent Network Visualization - Cherry</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/main.css') }}"
+    />
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+      .network-container {
+        width: 100%;
+        height: 600px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin-top: 20px;
+      }
+      .node {
+        fill: #ff6b6b;
+        stroke: #fff;
+        stroke-width: 2px;
+      }
+      .link {
+        stroke: #999;
+        stroke-opacity: 0.6;
+      }
+      .node text {
+        font-size: 12px;
+        fill: #333;
+      }
+      .controls {
+        margin: 20px 0;
+        padding: 10px;
+        background: #f5f5f5;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Cherry</h1>
+      <nav>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/dashboard">Dashboard</a></li>
+          <li><a href="/visualization/agent-network">Agent Network</a></li>
+          <li><a href="/status">System Status</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <h2>Agent Network Visualization</h2>
+      <p>
+        This visualization shows how different agents in the Cherry system
+        interact with each other.
+      </p>
+
+      <div class="controls">
+        <button id="refresh-btn">Refresh Data</button>
+        <label>
+          <input type="checkbox" id="show-labels" checked /> Show Labels
+        </label>
+      </div>
+
+      <div id="network" class="network-container"></div>
+    </main>
+
+    <footer>
+      <p>&copy; 2025 Cherry Project</p>
+    </footer>
+
+    <script>
+      // Sample data - in a real app, this would come from an API
+      const sampleData = {
+        nodes: [
+          { id: "code_agent", name: "Code Agent", type: "analysis" },
+          { id: "security_agent", name: "Security Agent", type: "security" },
+          { id: "ui_agent", name: "UI Agent", type: "interface" },
+          { id: "orchestrator", name: "Orchestrator", type: "control" },
+          { id: "memory", name: "Memory System", type: "storage" },
+        ],
+        links: [
+          { source: "code_agent", target: "orchestrator", value: 5 },
+          { source: "security_agent", target: "orchestrator", value: 3 },
+          { source: "ui_agent", target: "orchestrator", value: 8 },
+          { source: "orchestrator", target: "memory", value: 10 },
+          { source: "code_agent", target: "memory", value: 2 },
+          { source: "security_agent", target: "memory", value: 2 },
+        ],
+      };
+
+      // D3.js visualization code would go here
+      // This is a placeholder for the actual network visualization
+      document
+        .getElementById("refresh-btn")
+        .addEventListener("click", function () {
+          alert(
+            "In a real app, this would refresh the network data from the API"
+          );
+        });
+    </script>
+  </body>
+</html>
