@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Task Monitor</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+      .task {
+        margin-bottom: 10px;
+      }
+      .error {
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Task Monitor</h1>
+    <div id="status"></div>
+    <div id="tasks"></div>
+    <div id="errors"></div>
+    <script>
+      const OrchestratorBridge = require('../../agent_system/orchestrator_bridge');
+      const prompts = require('../prompts/reviewCyclePrompts');
+      const logger = require('../utils/unifiedLogger');
+
+      class ReviewCycle {
+        constructor() {
+          this.bridge = new OrchestratorBridge();
+          // Register this component as an agent
+          this.agentId = null;
+          this.connectToBridge();
+        }
+
+        connectToBridge() {
+          // Connect to the WebSocket server
+          const ws = new WebSocket('ws://localhost:3000');
+          
+          ws.onopen = () => {
+            ws.send(JSON.stringify({
+              type: 'agent:register',
+              data: {
+                name: 'ReviewCycle',
+                capabilities: ['code-review', 'code-improvement']
+              }
+            }));
+          };
+          
+          ws.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+            if (message.type === 'agent:registered') {
+              this.agentId = message.data.agentId;
+              logger.info(`Registered as agent ${this.agentId}`);
+            }
+            // Handle other messages as needed
+          };
+          
+          this.socket = ws;
+        }
+        
+        // Rest of implementation modified to use the WebSocket for communication
+      }
+
+      async function fetchTasks() {
+        const response = await fetch("/api/tasks");
+        const data = await response.json();
+        document.getElementById("status").innerText = `Status: ${data.status}`;
+        const tasksDiv = document.getElementById("tasks");
+        tasksDiv.innerHTML = "";
+        if (data.tasks.length === 0) {
+          tasksDiv.innerText = "I am asleep now";
+        } else {
+          data.tasks.forEach((task) => {
+            const taskDiv = document.createElement("div");
+            taskDiv.className = "task";
+            taskDiv.innerText = `${new Date(
+              task.timestamp * 1000
+            ).toLocaleTimeString()}: ${task.task}`;
+            tasksDiv.appendChild(taskDiv);
+          });
+        }
+        const errorsDiv = document.getElementById("errors");
+        errorsDiv.innerHTML = "";
+        data.errors.forEach((error) => {
+          const errorDiv = document.createElement("div");
+          errorDiv.className = "error";
+          errorDiv.innerText = `${new Date(
+            error.timestamp * 1000
+          ).toLocaleTimeString()}: ${error.message}`;
+          errorsDiv.appendChild(errorDiv);
+        });
+      }
+      setInterval(fetchTasks, 5000);
+      fetchTasks();
+    </script>
+  </body>
+</html>
+
+// test/integration/orchestrator_communication.test.js
+describe('Orchestrator Communication', () => {
+  it('should successfully register with the Python orchestrator', async () => {
+    const reviewCycle = new ReviewCycle();
+    await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for connection
+    expect(reviewCycle.agentId).not.toBeNull();
+  });
+  
+  it('should successfully perform a code review', async () => {
+    const reviewCycle = new ReviewCycle();
+    await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for connection
+    
+    const result = await reviewCycle.performReview("console.log('test')");
+    expect(result).toHaveProperty('concerns');
+  });
+});

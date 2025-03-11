@@ -316,6 +316,7 @@ class AdaptiveFallbackChain extends FallbackChain {
     this.fallbackHistory.set(fallbackName, record);
   }
 
+  // Updated reorderFallbacksBySuccessRate snippet
   private reorderFallbacksBySuccessRate(): void {
     const now = Date.now();
     this.fallbacks.sort((a, b) => {
@@ -327,7 +328,6 @@ class AdaptiveFallbackChain extends FallbackChain {
         attempts: 0,
         successes: 0,
       };
-
       const rateA = historyA.attempts
         ? historyA.successes / historyA.attempts
         : 0;
@@ -335,7 +335,6 @@ class AdaptiveFallbackChain extends FallbackChain {
         ? historyB.successes / historyB.attempts
         : 0;
 
-      // Apply cooldown penalty if within cooldown period
       const penaltyA =
         historyA.lastFailureTimestamp &&
         now - historyA.lastFailureTimestamp < this.cooldownPeriod
@@ -346,6 +345,13 @@ class AdaptiveFallbackChain extends FallbackChain {
         now - historyB.lastFailureTimestamp < this.cooldownPeriod
           ? 0.5
           : 1.0;
+
+      if (penaltyA < 1.0) {
+        console.info(`Fallback ${a.name} is in cooldown; applying penalty.`);
+      }
+      if (penaltyB < 1.0) {
+        console.info(`Fallback ${b.name} is in cooldown; applying penalty.`);
+      }
 
       const effectiveA = rateA * penaltyA;
       const effectiveB = rateB * penaltyB;
@@ -365,44 +371,61 @@ class TelemetryRecorder {
     metrics: SystemMetrics,
     params?: OptimizationParameters
   ): void {
-    // Start the span and add enriched attributes including a timestamp.
-    const span = this.tracer.startSpan(`optimize.decision.${strategy}`, {
-      attributes: {
-        "optimization.strategy": strategy,
-        "metrics.systemLoad": metrics.systemLoad,
-        "metrics.taskQueue": metrics.taskQueue,
-        "decision.timestamp": Date.now().toString(),
-        ...(params && { "optimization.params": JSON.stringify(params) }),
-      },
-    });
-    this.logger.info("Optimization decision", {
-      strategy,
-      metrics: JSON.stringify(metrics),
-      params,
-      timestamp: Date.now(),
-    });
-    span.end();
+    try {
+      const span = this.tracer.startSpan(`optimize.decision.${strategy}`, {
+        attributes: {
+          "optimization.strategy": strategy,
+          "metrics.systemLoad": metrics.systemLoad,
+          "metrics.taskQueue": metrics.taskQueue,
+          "decision.timestamp": Date.now().toString(),
+          ...(params && { "optimization.params": JSON.stringify(params) }),
+        },
+      });
+      this.logger.info("Optimization decision", {
+        strategy,
+        metrics: JSON.stringify(metrics),
+        params,
+        timestamp: Date.now(),
+      });
+      span.end();
+    } catch (error) {
+      this.logger.error("Failed to record optimization decision", error);
+    }
   }
 }
 
 // --- Performance Impact Recorder ---
 class PerformanceImpactRecorder {
+  private logger = console; // Replace with your preferred logger if needed
+
   recordImpact(
     strategy: string,
     before: SystemMetrics,
     after: SystemMetrics
   ): OptimizationImpact {
-    const impact: OptimizationImpact = {
-      systemLoadDelta: before.systemLoad - after.systemLoad,
-      responseTimeDelta: (before.responseTime || 0) - (after.responseTime || 0),
-      errorRateDelta: (before.errorRate || 0) - (after.errorRate || 0),
-      resourceUsageDelta:
-        (before.memoryUsage || 0) +
-        (before.cpuLoad || 0) -
-        ((after.memoryUsage || 0) + (after.cpuLoad || 0)),
-    };
-    console.log(`Strategy ${strategy} impact: ${JSON.stringify(impact)}`);
-    return impact;
+    try {
+      const impact: OptimizationImpact = {
+        systemLoadDelta: before.systemLoad - after.systemLoad,
+        responseTimeDelta:
+          (before.responseTime || 0) - (after.responseTime || 0),
+        errorRateDelta: (before.errorRate || 0) - (after.errorRate || 0),
+        resourceUsageDelta:
+          (before.memoryUsage || 0) +
+          (before.cpuLoad || 0) -
+          ((after.memoryUsage || 0) + (after.cpuLoad || 0)),
+      };
+      console.log(`Strategy ${strategy} impact: ${JSON.stringify(impact)}`);
+      return impact;
+    } catch (error) {
+      this.logger.error("Failed to record performance impact", error);
+      // Fallback: return a zero or neutral impact in case of an error
+      return {
+        systemLoadDelta: 0,
+        responseTimeDelta: 0,
+        errorRateDelta: 0,
+        resourceUsageDelta: 0,
+      };
+    }
   }
 }
 

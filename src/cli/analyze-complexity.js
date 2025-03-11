@@ -622,6 +622,8 @@ async function main() {
   }
 }
 
+const AgentOrchestrator = require("../utils/agentOrchestrator");
+
 if (typeof main === "function") {
   main();
 }

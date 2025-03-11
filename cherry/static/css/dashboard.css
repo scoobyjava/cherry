@@ -1,0 +1,61 @@
+/* Cherry Dashboard Styles */
+:root {
+  --cherry-red: #e53e3e;
+  --cherry-red-dark: #c53030;
+  --bg-dark: #1a202c;
+  --bg-darker: #171923;
+  --text-light: #f7fafc;
+  --text-muted: #a0aec0;
+}
+
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-dark);
+  color: var(--text-light);
+}
+
+.card {
+  background-color: var(--bg-darker);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-darker);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--cherry-red-dark);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--cherry-red);
+}
+
+/* Animation for data updates */
+@keyframes highlight {
+  0% {
+    background-color: rgba(229, 62, 62, 0.2);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.highlight {
+  animation: highlight 2s ease-out;
+}
