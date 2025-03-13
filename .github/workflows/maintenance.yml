@@ -1,0 +1,25 @@
+name: Infrastructure Maintenance
+on:
+  schedule:
+    - cron: '0 3 * * MON'
+  workflow_dispatch:
+jobs:
+  drift-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan for Drift Detection
+        id: plan
+        run: |
+          terraform plan -detailed-exitcode -out=tfplan || exit 0
+          
+      - name: Auto-Apply Drift Changes
+        if: ${{ failure() }}
+        run: terraform apply -auto-approve tfplan
