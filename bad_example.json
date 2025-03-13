@@ -1,0 +1,28 @@
+// src/api/agentRouter.ts
+import express from 'express';
+import http from 'http';
+import { Server as SocketIOServer } from 'socket.io';
+import multer from 'multer';
+import projectRouter from './projectRouter';
+
+const app = express();
+
+// ... existing middleware setup ...
+app.use(express.json()); // Make sure to parse JSON request bodies
+
+// Use the project router
+app.use(projectRouter);
+
+const server = http.createServer(app);
+const io = new SocketIOServer(server);
+
+// ... multer setup (if needed) ...
+const storage = multer.memoryStorage(); // Example storage
+const upload = multer({ storage: storage });
+
+// ... Socket.IO setup ...
+
+const PORT = process.env.PORT || 3001;
+server.listen(PORT, () => {
+  console.log(`Agent router listening on port ${PORT}`);
+});
