@@ -1,162 +1,572 @@
-from cherry.agents.base_agent import Agent
-from datetime import datetime
-from typing import Dict, Any, List, Optional
+<<<<<<< Tabnine <<<<<<<
+from cherry.agents.base_agent import Agent#-
+from datetime import datetime#-
+from typing import Dict, Any, List, Optional#-
 import asyncio
-import json
+import json#-
+import logging#+
+import threading#+
 import time
-import networkx as nx
-from threading import Lock
+import networkx as nx#-
+from threading import Lock#-
 from typing import Dict, Any, List, Optional, Callable, Type, Union
-from dataclasses import dataclass, field
-import threading
-import logging
-import traceback
-import importlib
-import inspect
+from dataclasses import dataclass, field#-
+import threading#-
+import logging#-
+import traceback#-
+import importlib#-
+import inspect#-
+from cherry.agents.base_agent import Agent#+
 
-import openai
-from config import Config
-from logger import logger
-from memory_chroma import ChromaMemory
-from .tasks import TASKS
-from .task_handlers import handle_task1, handle_task2
-from .llm_interface import LLMInterface
-from .llm_adapter_1 import LLMAdapter1
-from .llm_adapter_2 import LLMAdapter2
-from .task_queue import TaskQueue
-from .agent_selector import AgentSelector
-from .exceptions import (
-    AgentException, AgentInitializationError, AgentExecutionError,
-    OrchestratorException, WorkflowException, ResourceUnavailableException
-)
-from .recovery import RecoveryManager, RetryStrategy, FallbackAgentStrategy
-from .errors import (
-    CherryError, AgentError, AgentTimeoutError, OrchestratorError,
-    MemoryError, ConfigurationError
-)
-from .monitoring import ErrorMonitor
-from .recovery import retry, ErrorRecoveryHandler, ExponentialBackoff, ConstantRetry
+import openai#-
+from config import Config#-
+from logger import logger#-
+from memory_chroma import ChromaMemory#-
+from .tasks import TASKS#-
+from .task_handlers import handle_task1, handle_task2#-
+from .llm_interface import LLMInterface#-
+from .llm_adapter_1 import LLMAdapter1#-
+from .llm_adapter_2 import LLMAdapter2#-
+from .task_queue import TaskQueue#-
+from .agent_selector import AgentSelector#-
+from .exceptions import (#-
+    AgentException, AgentInitializationError, AgentExecutionError,#-
+    OrchestratorException, WorkflowException, ResourceUnavailableException#-
+)#-
+from .recovery import RecoveryManager, RetryStrategy, FallbackAgentStrategy#-
+from .errors import (#-
+    CherryError, AgentError, AgentTimeoutError, OrchestratorError,#-
+    MemoryError, ConfigurationError#-
+)#-
+from .monitoring import ErrorMonitor#-
+from .recovery import retry, ErrorRecoveryHandler, ExponentialBackoff, ConstantRetry#-
+# Configure logging#+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')#+
+logger = logging.getLogger("cherry-orchestrator")#+
 
+class UnifiedOrchestrator:#+
+    """#+
+    Central coordinator for Cherry's agent ecosystem.#+
+    Manages agent interactions, workflows, and maintains system state.#+
+    Supports both synchronous and asynchronous operation modes.#+
+    """#+
 
-@dataclass
-class TaskDependency:
-    prerequisite_ids: List[int] = field(default_factory=list)
-    blocking_conditions: List[Dict[str, Any]] = field(default_factory=list)
+@dataclass#-
+class TaskDependency:#-
+    prerequisite_ids: List[int] = field(default_factory=list)#-
+    blocking_conditions: List[Dict[str, Any]] = field(default_factory=list)#-
+    def __init__(self, config_path: str = 'config.json'):#+
+        """#+
+        Initialize the orchestrator with configuration.#+
 
+        Args:#+
+            config_path: Path to the configuration file#+
+        """#+
+        # Core state#+
+        self.is_running = False#+
+        self.task_queue = []#+
+        self.completed_tasks = []#+
+        self.lock = threading.RLock()#+
+        self._thread = None#+
+        self.loop = None#+
 
-@dataclass
-class TaskMetrics:
-    attempts: int = 0
-    success_rate: float = 0.0
-    avg_processing_time: float = 0.0
-    last_execution_time: float = 0.0
-    total_processing_time: float = 0.0
+@dataclass#-
+class TaskMetrics:#-
+    attempts: int = 0#-
+    success_rate: float = 0.0#-
+    avg_processing_time: float = 0.0#-
+    last_execution_time: float = 0.0#-
+    total_processing_time: float = 0.0#-
+        # Agent management#+
+        self.agents = {}#+
+        self.max_concurrent_tasks = 3#+
 
+        # Async specific#+
+        self.async_task_queue = asyncio.Queue()#+
+        self.approval_queue = []#+
+        self.task_status = {}#+
 
-class TaskOrchestrationError(Exception):
-    pass
+class TaskOrchestrationError(Exception):#-
+    pass#-
+        # Load configuration#+
+        self.load_configuration(config_path)#+
 
+        # Initialize memory system#+
+        self._init_memory_system()#+
 
-class AdvancedOrchestrator:
-    def __init__(self, config_path: str = 'config.json'):
-        self.task_queue = []
-        self.completed_tasks = []
-        self.task_dependency_graph = nx.DiGraph()
-        self.task_metrics: Dict[int, TaskMetrics] = {}
-        self.lock = Lock()
-        self.running = False
-        self.agent_performance: Dict[str, Dict[str, Any]] = {}
+class AdvancedOrchestrator:#-
+    def __init__(self, config_path: str = 'config.json'):#-
+        self.task_queue = []#-
+        self.completed_tasks = []#-
+        self.task_dependency_graph = nx.DiGraph()#-
+        self.task_metrics: Dict[int, TaskMetrics] = {}#-
+        self.lock = Lock()#-
+        self.running = False#-
+        self.agent_performance: Dict[str, Dict[str, Any]] = {}#-
+        logger.info("UnifiedOrchestrator initialized")#+
 
-        self.load_configuration(config_path)
-        self._init_memory_system()
-        self.loop = asyncio.new_event_loop()
-        self.lock = threading.Lock()
-        self.tasks = []
-        self.task_dependencies = {}
-        logging.basicConfig(level=logging.DEBUG)
-
+        self.load_configuration(config_path)#-
+        self._init_memory_system()#-
+        self.loop = asyncio.new_event_loop()#-
+        self.lock = threading.Lock()#-
+        self.tasks = []#-
+        self.task_dependencies = {}#-
+        logging.basicConfig(level=logging.DEBUG)#-
     def load_configuration(self, config_path: str):
-        """Load configuration settings from a JSON file."""
+        """Load configuration settings from a JSON file."""#-
+        """Load configuration from the specified path."""#+
         try:
-            with open(config_path, 'r') as config_file:
-                self.advanced_config = json.load(config_file)
-        except FileNotFoundError:
-            self.advanced_config = {
-                "max_concurrent_tasks": 5,
-                "task_timeout": 3600
-            }
+            with open(config_path, 'r') as config_file:#-
+                self.advanced_config = json.load(config_file)#-
+        except FileNotFoundError:#-
+            self.advanced_config = {#-
+                "max_concurrent_tasks": 5,#-
+                "task_timeout": 3600#-
+            }#-
+            # Configuration loading logic here#+
+            logger.info(f"Configuration loaded from {config_path}")#+
+        except Exception as e:#+
+            logger.error(f"Failed to load configuration: {e}")#+
+            # Set default configuration#+
+            pass#+
 
     def _init_memory_system(self):
-        """Initialize the memory system using ChromaMemory."""
+        """Initialize the memory system using ChromaMemory."""#-
+        """Initialize the memory system for task tracking and history."""#+
         try:
-            self.primary_memory = ChromaMemory(
-                collection_name="cherry_primary_memory")
-            logger.info("Memory initialized successfully.")
+            self.primary_memory = ChromaMemory(#-
+                collection_name="cherry_primary_memory")#-
+            logger.info("Memory initialized successfully.")#-
+            # Memory system initialization logic here#+
+            logger.info("Memory system initialized")#+
         except Exception as e:
             logger.error(f"Memory initialization failed: {e}")
 
     def add_task(self, description: str, priority: int = 1, context: Optional[Dict[str, Any]] = None) -> int:
-        """Add a new task to the queue and return its unique ID."""
+        """Add a new task to the queue and return its unique ID."""#-
+        """#+
+        Add a task to the queue for processing.#+
+#+
+        Args:#+
+            description: Task description#+
+            priority: Task priority (lower number = higher priority)#+
+            context: Additional context for the task#+
+#+
+        Returns:#+
+            task_id: Unique identifier for the task#+
+        """#+
+        task_id = len(self.task_queue) + len(self.completed_tasks) + 1#+
+        task = {#+
+            "id": task_id,#+
+            "description": description,#+
+            "priority": priority,#+
+            "status": "pending",#+
+            "context": context or {},#+
+            "created_at": time.time(),#+
+            "dependencies": []#+
+        }#+
         with self.lock:
-            task_id = len(self.task_queue) + len(self.completed_tasks) + 1
-            task = {
-                "id": task_id,
-                "description": description,
-                "priority": priority,
-                "context": context or {},
-                "status": "pending",
-                "created_at": time.time()
-            }
+            task_id = len(self.task_queue) + len(self.completed_tasks) + 1#-
+            task = {#-
+                "id": task_id,#-
+                "description": description,#-
+                "priority": priority,#-
+                "context": context or {},#-
+                "status": "pending",#-
+                "created_at": time.time()#-
+            }#-
             self.task_queue.append(task)
-            self.task_dependency_graph.add_node(task_id)
-            self.task_metrics[task_id] = TaskMetrics()
-            logger.info(f"Task {task_id} added: {description}")
-            logging.debug(f"Adding task {task_id} with dependencies {[]}")
-            self.tasks.append(task_id)
-            self.task_dependencies[task_id] = []
-            self._check_for_cycles()
-            return task_id
+            self.task_dependency_graph.add_node(task_id)#-
+            self.task_metrics[task_id] = TaskMetrics()#-
+            logger.info(f"Task {task_id} added: {description}")#-
+            logging.debug(f"Adding task {task_id} with dependencies {[]}")#-
+            self.tasks.append(task_id)#-
+            self.task_dependencies[task_id] = []#-
+            self._check_for_cycles()#-
+            return task_id#-
+            # Sort by priority#+
+            self.task_queue.sort(key=lambda t: t["priority"])#+
 
+        logger.info(f"Task added: {task_id} - {description}")#+
+        return task_id#+
     def _check_for_cycles(self):
+        """Check for dependency cycles in the task queue."""#+
         visited = set()
-        stack = set()
+        stack = set()#-
+        path = set()#+
 
         def visit(task):
-            if task in stack:
-                logging.error(
-                    f"Cycle detected: {task} is in the stack {stack}")
-                raise Exception("Task dependency cycle detected")
-            if task not in visited:
-                logging.debug(f"Visiting task {task}")
-                stack.add(task)
-                for dep in self.task_dependencies.get(task, []):
-                    visit(dep)
-                stack.remove(task)
-                visited.add(task)
+            if task in stack:#-
+                logging.error(#-
+                    f"Cycle detected: {task} is in the stack {stack}")#-
+                raise Exception("Task dependency cycle detected")#-
+            if task not in visited:#-
+                logging.debug(f"Visiting task {task}")#-
+                stack.add(task)#-
+                for dep in self.task_dependencies.get(task, []):#-
+                    visit(dep)#-
+                stack.remove(task)#-
+                visited.add(task)#-
+            task_id = task["id"]#+
+            if task_id in path:#+
+                raise ValueError(f"Cycle detected in task dependencies involving task {task_id}")#+
+            if task_id in visited:#+
+                return#+
 
-        for task in self.tasks:
+        for task in self.tasks:#-
+            visited.add(task_id)#+
+            path.add(task_id)#+
+#+
+            for dep_id in task.get("dependencies", []):#+
+                dep_task = next((t for t in self.task_queue if t["id"] == dep_id), None)#+
+                if dep_task:#+
+                    visit(dep_task)#+
+#+
+            path.remove(task_id)#+
+#+
+        for task in self.task_queue:#+
             visit(task)
 
+        logger.debug("No cycles detected in task dependencies")#+
     def get_task_status(self, task_id: int) -> Dict[str, Any]:
-        """Retrieve the status and details of a specific task by its ID."""
+        """Retrieve the status and details of a specific task by its ID."""#-
+        """#+
+        Get the status of a specific task.#+
+#+
+        Args:#+
+            task_id: The ID of the task to check#+
+#+
+        Returns:#+
+            Dict containing task status information#+
+        """#+
         with self.lock:
             for task in self.task_queue + self.completed_tasks:
                 if task["id"] == task_id:
                     return task
-            return {"error": f"Task {task_id} not found"}
+            return {"error": f"Task {task_id} not found"}#-
+        return {"error": f"Task {task_id} not found"}#+
 
     def get_all_tasks(self) -> List[Dict[str, Any]]:
-        """Return a list of all tasks, both queued and completed."""
+        """Return a list of all tasks, both queued and completed."""#-
+        """#+
+        Get all tasks (pending and completed).#+
+#+
+        Returns:#+
+            List of all tasks#+
+        """#+
         with self.lock:
             return self.task_queue + self.completed_tasks
 
     def clear_completed_tasks(self):
         """Clear the list of completed tasks."""
         with self.lock:
-            self.completed_tasks.clear()
-            logger.info("Completed tasks cleared")
+            self.completed_tasks.clear()#-
+            logger.info("Completed tasks cleared")#-
+            self.completed_tasks = []#+
+        logger.info("Completed tasks cleared")#+
 
-    async def _process_task_with_llm(self, task: Dict[str, Any]) -> Dict[str, Any]:
+    async def _process_task_with_llm(self, task: Dict[str, Any]) -> Dict[str, Any]:#-
+    def register_agent(self, agent: Agent) -> None:#+
+        """#+
+        Register an agent with the orchestrator.#+
+#+
+        Args:#+
+            agent: The agent to register#+
+        """#+
+        self.agents[agent.name] = agent#+
+        logger.info(f"Registered agent: {agent.name}")#+
+#+
+    def _select_agent_for_task(self, task: Dict[str, Any]) -> Optional[Agent]:#+
+        """#+
+        Select the most appropriate agent for a task.#+
+#+
+        Args:#+
+            task: The task to assign#+
+#+
+        Returns:#+
+            The selected agent or None if no suitable agent found#+
+        """#+
+        # Agent selection logic here#+
+        # For now, return the first agent if any exist#+
+        if self.agents:#+
+            return next(iter(self.agents.values()))#+
+        return None#+
+#+
+    def can_execute_task(self, task: Dict[str, Any]) -> bool:#+
+        """#+
+        Check if a task can be executed (all dependencies satisfied).#+
+#+
+        Args:#+
+            task: The task to check#+
+#+
+        Returns:#+
+            True if the task can be executed, False otherwise#+
+        """#+
+        for dep_id in task.get("dependencies", []):#+
+            dep_completed = any(t["id"] == dep_id and t["status"] == "completed" #+
+                               for t in self.completed_tasks)#+
+            if not dep_completed:#+
+                return False#+
+        return True#+
+#+
+    def process_with_agent(self, task: Dict[str, Any]):#+
+        """#+
+        Process a task using an appropriate agent.#+
+#+
+        Args:#+
+            task: The task to process#+
+        """#+
+        agent = self._select_agent_for_task(task)#+
+        if agent:#+
+            try:#+
+                logger.info(f"Processing task {task['id']} with agent {agent.name}")#+
+                # Update task status#+
+                task["status"] = "in_progress"#+
+#+
+                # Process task with agent#+
+                result = agent.process_task(task)#+
+#+
+                # Update task with result#+
+                task["result"] = result#+
+                task["status"] = "completed"#+
+                task["completed_at"] = time.time()#+
+#+
+                logger.info(f"Task {task['id']} completed successfully")#+
+            except Exception as e:#+
+                task["status"] = "failed"#+
+                task["error"] = str(e)#+
+                logger.error(f"Error processing task {task['id']}: {e}")#+
+        else:#+
+            task["status"] = "failed"#+
+            task["error"] = "No suitable agent found"#+
+            logger.error(f"No suitable agent found for task {task['id']}")#+
+#+
+    # Synchronous execution methods#+
+    def run(self):#+
+        """Start the orchestrator in synchronous mode."""#+
+        self.is_running = True#+
+        logger.info("UnifiedOrchestrator started in synchronous mode")#+
+#+
+        try:#+
+            while self.is_running:#+
+                executable_tasks = [task for task in self.task_queue if self.can_execute_task(task)]#+
+                for task in executable_tasks:#+
+                    self.process_with_agent(task)#+
+                    with self.lock:#+
+                        self.task_queue.remove(task)#+
+                        self.completed_tasks.append(task)#+
+                time.sleep(0.1)#+
+        except KeyboardInterrupt:#+
+            logger.info("Orchestrator stopped by user")#+
+        except Exception as e:#+
+            logger.error(f"Error running orchestrator: {str(e)}")#+
+        finally:#+
+            self.is_running = False#+
+            logger.info("UnifiedOrchestrator stopped")#+
+#+
+    def start_background(self):#+
+        """Start the orchestrator in a background thread."""#+
+        if self._thread and self._thread.is_alive():#+
+            logger.warning("Orchestrator is already running")#+
+            return#+
+#+
+        self._thread = threading.Thread(target=self.run, daemon=True)#+
+        self._thread.start()#+
+        logger.info("UnifiedOrchestrator started in background thread")#+
+        return self#+
+#+
+    def stop(self):#+
+        """Stop the orchestrator."""#+
+        self.is_running = False#+
+        if self._thread and self._thread.is_alive():#+
+            self._thread.join(timeout=5.0)#+
+        logger.info("UnifiedOrchestrator stopped")#+
+#+
+    # Asynchronous execution methods#+
+    async def _process_task_with_llm(self, task: Dict[str, Any]) -> Dict[str, Any]:#+
+        """#+
+        Process a task using LLM capabilities.#+
+#+
+        Args:#+
+            task: The task to process#+
+#+
+        Returns:#+
+            The processed task with results#+
+        """#+
+        try:#+
+            # LLM processing logic here#+
+            task["status"] = "completed"#+
+            task["completed_at"] = time.time()#+
+            return task#+
+        except Exception as e:#+
+            task["status"] = "failed"#+
+            task["error"] = str(e)#+
+            logger.error(f"Error processing task with LLM: {e}")#+
+            return {"error": str(e)}#+
+#+
+    async def _task_consumer(self) -> None:#+
+        """Asynchronous task consumer worker."""#+
+        while self.is_running:#+
+            try:#+
+                task = await self.async_task_queue.get()#+
+#+
+                # None is the signal to stop#+
+                if task is None:#+
+                    self.async_task_queue.task_done()#+
+                    break#+
+#+
+                logger.info(f"Processing task: {task.get('id', 'unknown')}")#+
+#+
+                # Select agent for task#+
+                agent = self._select_agent_for_task(task)#+
+#+
+                if agent:#+
+                    # Update task status#+
+                    task["status"] = "in_progress"#+
+                    self.task_status[task["id"]] = task#+
+#+
+                    try:#+
+                        # Process task with agent#+
+                        result = await agent.async_process_task(task)#+
+#+
+                        # Update task with result#+
+                        task["result"] = result#+
+                        task["status"] = "completed"#+
+                        task["completed_at"] = time.time()#+
+#+
+                        logger.info(f"Task {task['id']} completed successfully")#+
+                    except Exception as e:#+
+                        task["status"] = "failed"#+
+                        task["error"] = str(e)#+
+                        logger.error(f"Error processing task {task['id']}: {e}")#+
+                else:#+
+                    task["status"] = "failed"#+
+                    task["error"] = "No suitable agent found"#+
+                    logger.error(f"No suitable agent found for task {task['id']}")#+
+#+
+                # Mark task as done#+
+                self.async_task_queue.task_done()#+
+#+
+            except asyncio.CancelledError:#+
+                break#+
+            except Exception as e:#+
+                logger.error(f"Error in task consumer: {e}")#+
+                await asyncio.sleep(1)  # Prevent busy-waiting when errors occur#+
+#+
+    async def start(self) -> None:#+
+        """Start the orchestrator in asynchronous mode."""#+
+        self.is_running = True#+
+        logger.info("UnifiedOrchestrator started in asynchronous mode")#+
+#+
+        # Start task consumer workers#+
+        consumers = [#+
+            asyncio.create_task(self._task_consumer())#+
+            for _ in range(self.max_concurrent_tasks)#+
+        ]#+
+#+
+        # Wait for all consumers to complete (won't happen unless stop() is called)#+
+        await asyncio.gather(*consumers)#+
+#+
+    async def stop_async(self) -> None:#+
+        """Stop the asynchronous orchestrator."""#+
+        self.is_running = False#+
+#+
+        # Signal all consumers to stop#+
+        for _ in range(self.max_concurrent_tasks):#+
+            await self.async_task_queue.put(None)#+
+#+
+        logger.info("UnifiedOrchestrator async mode stopped")#+
+#+
+    async def submit_task(self, task_type: str, task_data: Dict[str, Any]) -> str:#+
+        """#+
+        Submit a task to the async queue.#+
+#+
+        Args:#+
+            task_type: Type of task#+
+            task_data: Task data#+
+#+
+        Returns:#+
+            task_id: Unique identifier for the task#+
+        """#+
+        task_id = f"{task_type}-{time.time()}"#+
+        task = {#+
+            "id": task_id,#+
+            "type": task_type,#+
+            "data": task_data,#+
+            "status": "pending",#+
+            "created_at": time.time()#+
+        }#+
+#+
+        self.task_status[task_id] = task#+
+        await self.async_task_queue.put(task)#+
+#+
+        logger.info(f"Task submitted: {task_id}")#+
+        return task_id#+
+#+
+    async def get_async_task_status(self, task_id: str) -> Dict[str, Any]:#+
+        """#+
+        Get the status of an async task.#+
+#+
+        Args:#+
+            task_id: The ID of the task to check#+
+#+
+        Returns:#+
+            Dict containing task status information#+
+        """#+
+        if task_id in self.task_status:#+
+            return self.task_status[task_id]#+
+        return {"error": f"Task {task_id} not found"}#+
+#+
+    async def get_pending_approvals(self) -> List[Dict[str, Any]]:#+
+        """#+
+        Get all pending approval tasks.#+
+#+
+        Returns:#+
+            List of tasks pending approval#+
+        """#+
+        return self.approval_queue#+
+#+
+    async def approve_change(self, task_id: str, approved: bool, feedback: str = "") -> Dict[str, Any]:#+
+        """#+
+        Approve or reject a pending change.#+
+#+
+        Args:#+
+            task_id: The ID of the task to approve/reject#+
+            approved: Whether the change is approved#+
+            feedback: Optional feedback#+
+#+
+        Returns:#+
+            Dict containing the result of the approval action#+
+        """#+
+        for i, task in enumerate(self.approval_queue):#+
+            if task["id"] == task_id:#+
+                task["approved"] = approved#+
+                task["feedback"] = feedback#+
+#+
+                # Remove from approval queue#+
+                self.approval_queue.pop(i)#+
+#+
+                if approved:#+
+                    # Process the approved change#+
+                    await self._process_approved_change(task)#+
+                    return {"status": "approved", "task": task}#+
+                else:#+
+                    return {"status": "rejected", "task": task}#+
+#+
+        return {"error": f"Task {task_id} not found in approval queue"}#+
+#+
+    async def _process_approved_change(self, task: Dict[str, Any]) -> None:#+
+        """#+
+        Process an approved change.#+
+#+
+        Args:#+
+            task: The approved task to process#+
+        """#+
+        try:#+
+            # Implementation logic for approved changes#+
+            logger.info(f"Processing approved change for task {task['id']}")#+
+            # Actual implementation would depend on the task type#+
+>>>>>>> Tabnine >>>>>>># {"source":"chat"}
         """Process a task using a language model (placeholder implementation)."""
         description = task.get("description", "")
         logger.info(f"Processing task {task['id']} with LLM: {description}")
