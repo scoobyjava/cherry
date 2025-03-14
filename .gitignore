@@ -106,3 +106,9 @@ docker-compose.override.yml//+
 *.dylib//+
 >>>>>>> Tabnine >>>>>>>// {"source":"chat"}
 scripts/load-env.sh
+react-app/node_modules/@swc/core-linux-x64-musl/swc.linux-x64-musl.node
+code_review_results/bandit_results.txt
+venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so
+venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so
+code_review_results/bandit_results.txt
+react-app/node_modules/@swc/core-linux-x64-musl/swc.linux-x64-musl.node
