@@ -1,0 +1,133 @@
+<<<<<<< Tabnine <<<<<<<
+<!DOCTYPE html>//+
+<html lang="en">//+
+<head>//+
+    <meta charset="UTF-8">//+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">//+
+    <title>Cherry Agent Network Visualization</title>//+
+    <link rel="stylesheet" href="/static/css/main.css">//+
+    <script src="https://d3js.org/d3.v7.min.js"></script>//+
+    <style>//+
+        .node {//+
+            stroke: #fff;//+
+            stroke-width: 1.5px;//+
+        }//+
+        .link {//+
+            stroke: #999;//+
+            stroke-opacity: 0.6;//+
+        }//+
+        #visualization {//+
+            width: 100%;//+
+            height: 600px;//+
+            border: 1px solid #ddd;//+
+            border-radius: 5px;//+
+        }//+
+    </style>//+
+</head>//+
+<body>//+
+    <header>//+
+        <h1>Cherry Agent Network</h1>//+
+        <nav>//+
+            <a href="/">Home</a>//+
+            <a href="/dashboard">Dashboard</a>//+
+        </nav>//+
+    </header>//+
+//+
+    <main>//+
+        <div id="visualization"></div>//+
+    </main>//+
+//+
+    <script>//+
+        // Fetch agent network data//+
+        fetch('/api/agent-network')//+
+            .then(response => response.json())//+
+            .then(data => createVisualization(data));//+
+//+
+        function createVisualization(data) {//+
+            const width = document.getElementById('visualization').clientWidth;//+
+            const height = document.getElementById('visualization').clientHeight;//+
+//+
+            const svg = d3.select("#visualization")//+
+                .append("svg")//+
+                .attr("width", width)//+
+                .attr("height", height);//+
+//+
+            // Create a force simulation//+
+            const simulation = d3.forceSimulation(data.nodes)//+
+                .force("link", d3.forceLink(data.links).id(d => d.id).distance(100))//+
+                .force("charge", d3.forceManyBody().strength(-300))//+
+                .force("center", d3.forceCenter(width / 2, height / 2));//+
+//+
+            // Add links//+
+            const link = svg.append("g")//+
+                .selectAll("line")//+
+                .data(data.links)//+
+                .enter()//+
+                .append("line")//+
+                .attr("class", "link")//+
+                .style("stroke-width", d => Math.sqrt(d.value));//+
+//+
+            // Add nodes//+
+            const node = svg.append("g")//+
+                .selectAll("circle")//+
+                .data(data.nodes)//+
+                .enter()//+
+                .append("circle")//+
+                .attr("class", "node")//+
+                .attr("r", d => d.size / 2)//+
+                .style("fill", d => d3.schemeCategory10[d.group % 10])//+
+                .call(d3.drag()//+
+                    .on("start", dragstarted)//+
+                    .on("drag", dragged)//+
+                    .on("end", dragended));//+
+//+
+            // Add labels//+
+            const label = svg.append("g")//+
+                .selectAll("text")//+
+                .data(data.nodes)//+
+                .enter()//+
+                .append("text")//+
+                .text(d => d.id)//+
+                .attr("font-size", 12)//+
+                .attr("dx", 15)//+
+                .attr("dy", 4);//+
+//+
+            // Update positions on simulation tick//+
+            simulation.on("tick", () => {//+
+                link//+
+                    .attr("x1", d => d.source.x)//+
+                    .attr("y1", d => d.source.y)//+
+                    .attr("x2", d => d.target.x)//+
+                    .attr("y2", d => d.target.y);//+
+//+
+                node//+
+                    .attr("cx", d => d.x)//+
+                    .attr("cy", d => d.y);//+
+//+
+                label//+
+                    .attr("x", d => d.x)//+
+                    .attr("y", d => d.y);//+
+            });//+
+//+
+            // Drag functions//+
+            function dragstarted(event, d) {//+
+                if (!event.active) simulation.alphaTarget(0.3).restart();//+
+                d.fx = d.x;//+
+                d.fy = d.y;//+
+            }//+
+//+
+            function dragged(event, d) {//+
+                d.fx = event.x;//+
+                d.fy = event.y;//+
+            }//+
+//+
+            function dragended(event, d) {//+
+                if (!event.active) simulation.alphaTarget(0);//+
+                d.fx = null;//+
+                d.fy = null;//+
+            }//+
+        }//+
+    </script>//+
+</body>//+
+</html>//+
+>>>>>>> Tabnine >>>>>>>// {"source":"chat"}

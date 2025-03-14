@@ -1,0 +1,64 @@
+app_name: Cherry AI
+debug: false
+
+logging:
+  level: INFO
+  file_path: logs/cherry_ai.log
+
+memory:
+  provider: chroma
+  persist_directory: chroma_db
+  embedding_function: openai
+
+<<<<<<< Tabnine <<<<<<<
+llm:#-
+  provider: openai#-
+  model: gpt-4#-
+  temperature: 0.7#-
+# LiteLLM Configuration#+
+model_list:#+
+  - model_name: gpt-4#+
+    litellm_params:#+
+      model: azure/gpt-4#+
+      api_base: ${AZURE_OPENAI_ENDPOINT}#+
+      api_key: ${AZURE_OPENAI_KEY}#+
+      api_version: "2023-07-01-preview"#+
+#+
+  - model_name: gpt-3.5-turbo#+
+    litellm_params:#+
+      model: azure/gpt-35-turbo#+
+      api_base: ${AZURE_OPENAI_ENDPOINT}#+
+      api_key: ${AZURE_OPENAI_KEY}#+
+      api_version: "2023-07-01-preview"#+
+#+
+  - model_name: text-embedding-ada-002#+
+    litellm_params:#+
+      model: azure/text-embedding-ada-002#+
+      api_base: ${AZURE_OPENAI_ENDPOINT}#+
+      api_key: ${AZURE_OPENAI_KEY}#+
+      api_version: "2023-07-01-preview"#+
+#+
+# Router settings#+
+router_settings:#+
+  timeout: 30#+
+  retry_count: 3#+
+  fallbacks: [{"gpt-4": ["gpt-3.5-turbo"]}]#+
+#+
+# Logging and observability#+
+logging:#+
+  level: info#+
+  log_requests: true#+
+  log_responses: false#+
+#+
+# Cache settings (optional)#+
+cache:#+
+  type: redis#+
+  host: ${REDIS_HOST}#+
+  port: ${REDIS_PORT}#+
+  password: ${REDIS_PASSWORD}#+
+#+
+# Authentication#+
+api_key:#+
+  use_key: true#+
+  master_key: ${LITELLM_MASTER_KEY}#+
+>>>>>>> Tabnine >>>>>>># {"source":"chat"}

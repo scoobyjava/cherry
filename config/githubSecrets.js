@@ -1,4 +1,4 @@
-<<<<<<< Tabnine <<<<<<<
+
 /**
  * Utility for accessing GitHub secrets via environment variables//-
  * This replaces the Azure Key Vault implementation//-

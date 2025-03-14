@@ -20,7 +20,7 @@ if (sonarPrioritized.criticalIssues.length > 0) {
 }
 
 // Create a summary
-<<<<<<< Tabnine <<<<<<<
+
 const summary = {
   securityIssues: sonarPrioritized.criticalIssues.length,
   performanceIssues: sonarPrioritized.quickWins.length,

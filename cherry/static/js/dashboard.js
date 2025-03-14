@@ -114,7 +114,7 @@ function renderLeaderboard(agents) {
     container.appendChild(table);
 }
 
-<<<<<<< Tabnine <<<<<<<
+
 // Render agent network visualization using D3.js
 function//-
 function renderAgentNetwork(data) {//+

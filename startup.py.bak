@@ -78,37 +78,24 @@ def check_environment_variables(self) -> Dict[str, bool]:
     return results
 
 
-<<<<<<< Tabnine <<<<<<<
 def check_api_connections(self) -> Dict[str, bool]:
-    """Check connections to required APIs."""#-
-    apis = self.config.get("apis", {})#-
-    """Check API connections."""#+
-    api_configs = self.config.get("api_connections", {#+
-        "openai": {#+
-            "api_key_var": "OPENAI_API_KEY",#+
-            "test_url": "https://api.openai.com/v1/engines"#+
-        },#+
-        "github": {#+
-            "api_key_var": "GITHUB_TOKEN",#+
-            "test_url": "https://api.github.com/user"#+
-        }#+
-    })#+
+    """Check API connections."""
+    api_configs = self.config.get("api_connections", {
+        "openai": {
+            "api_key_var": "OPENAI_API_KEY",
+            "test_url": "https://api.openai.com/v1/engines"
+        },
+        "github": {
+            "api_key_var": "GITHUB_TOKEN",
+            "test_url": "https://api.github.com/user"
+        }
+    })
     results = {}
 
-    for api_name, api_config in apis.items():#-
-    for api_name, api_config in api_configs.items():#+
+    for api_name, api_config in api_configs.items():
         try:
-            # Skip if no test URL is provided#-
-            if "test_url" not in api_config:#-
-                logger.warning(f"No test URL configured for API {api_name}")#-
-                results[api_name] = None#-
-                continue#-
-#-
-            # Get API key environment variable#-
-            api_key_var = api_config.get(#-
-                "api_key_var", f"{api_name.upper()}_API_KEY")#-
-            # Get API key from environment#+
-            api_key_var = api_config.get("api_key_var", f"{api_name.upper()}_API_KEY")#+
+            # Get API key from environment
+            api_key_var = api_config.get("api_key_var", f"{api_name.upper()}_API_KEY")
             api_key = os.environ.get(api_key_var, "")
 
             # Prepare headers
@@ -139,54 +126,52 @@ def check_api_connections(self) -> Dict[str, bool]:
             logger.error(f"Unexpected error checking API {api_name}: {e}")
             results[api_name] = False
 
-    return results#-
-    return results#+
-#+
-def monitor_api_connections(self, interval: int = 300) -> None:#+
-    """#+
-    Start a background thread to periodically monitor API connections.#+
-#+
-    Args:#+
-        interval: Time between checks in seconds (default: 5 minutes)#+
-    """#+
-    def _monitor_loop():#+
-        while self.monitoring_active:#+
-            logger.info("Running periodic API connection check...")#+
-            api_results = self.check_api_connections()#+
-#+
-            # Log any failures#+
-            failed_apis = [api for api, status in api_results.items() if not status]#+
-            if failed_apis:#+
-                logger.warning(f"API connection issues detected: {', '.join(failed_apis)}")#+
-#+
-                # Try to recover OpenAI specifically#+
-                if "openai" in failed_apis:#+
-                    try:#+
-                        logger.info("Attempting to reinitialize OpenAI client...")#+
-                        import openai#+
-                        openai.api_key = os.environ.get("OPENAI_API_KEY", "")#+
-                        openai.Engine.list()#+
-                        logger.info("OpenAI re-initialization successful.")#+
-                    except Exception as e:#+
-                        logger.error(f"OpenAI re-initialization failed: {e}")#+
-            else:#+
-                logger.info("All API connections are healthy.")#+
-#+
-            time.sleep(interval)#+
-#+
-    self.monitoring_active = True#+
-    self.monitor_thread = threading.Thread(target=_monitor_loop, daemon=True)#+
-    self.monitor_thread.start()#+
-    logger.info(f"API monitoring started (interval: {interval}s)")#+
-#+
-def stop_monitoring(self) -> None:#+
-    """Stop the API monitoring thread."""#+
-    if hasattr(self, 'monitoring_active'):#+
-        self.monitoring_active = False#+
-        if hasattr(self, 'monitor_thread') and self.monitor_thread.is_alive():#+
-            self.monitor_thread.join(timeout=5.0)#+
-            logger.info("API monitoring stopped.")#+
->>>>>>> Tabnine >>>>>>># {"source":"chat"}
+    return results
+
+def monitor_api_connections(self, interval: int = 300) -> None:
+    """
+    Start a background thread to periodically monitor API connections.
+
+    Args:
+        interval: Time between checks in seconds (default: 5 minutes)
+    """
+    def _monitor_loop():
+        while self.monitoring_active:
+            logger.info("Running periodic API connection check...")
+            api_results = self.check_api_connections()
+
+            # Log any failures
+            failed_apis = [api for api, status in api_results.items() if not status]
+            if failed_apis:
+                logger.warning(f"API connection issues detected: {', '.join(failed_apis)}")
+
+                # Try to recover OpenAI specifically
+                if "openai" in failed_apis:
+                    try:
+                        logger.info("Attempting to reinitialize OpenAI client...")
+                        import openai
+                        openai.api_key = os.environ.get("OPENAI_API_KEY", "")
+                        openai.Engine.list()
+                        logger.info("OpenAI re-initialization successful.")
+                    except Exception as e:
+                        logger.error(f"OpenAI re-initialization failed: {e}")
+            else:
+                logger.info("All API connections are healthy.")
+
+            time.sleep(interval)
+
+    self.monitoring_active = True
+    self.monitor_thread = threading.Thread(target=_monitor_loop, daemon=True)
+    self.monitor_thread.start()
+    logger.info(f"API monitoring started (interval: {interval}s)")
+
+def stop_monitoring(self) -> None:
+    """Stop the API monitoring thread."""
+    if hasattr(self, 'monitoring_active'):
+        self.monitoring_active = False
+        if hasattr(self, 'monitor_thread') and self.monitor_thread.is_alive():
+            self.monitor_thread.join(timeout=5.0)
+            logger.info("API monitoring stopped.")
 
 
 def check_azure_connections(self) -> Dict[str, bool]:

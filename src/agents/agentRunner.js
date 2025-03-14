@@ -1,4 +1,4 @@
-<<<<<<< Tabnine <<<<<<<
+
 const { exec } = require("child_process");//-
 const logger = require("../logger");
 const path = require("path");//-

@@ -1,6 +1,6 @@
 // ...existing code...
 
-<<<<<<< Tabnine <<<<<<<
+
 const { getSecret } = require("./config/azureKeyVault");//-
 const { getSecret } = require("./config/githubSecrets");//+
 

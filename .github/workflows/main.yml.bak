@@ -1,0 +1,47 @@
+<<<<<<< Tabnine <<<<<<<
+name: CI/CD#-
+name: Cherry AI Workflow#+
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+#+
+    env:#+
+      # Reference GitHub secrets here#+
+      AZURE_STORAGE_ACCOUNT: ${{ secrets.AZURE_STORAGE_ACCOUNT }}#+
+      AZURE_STORAGE_KEY1: ${{ secrets.AZURE_STORAGE_KEY1 }}#+
+      AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}#+
+      PHOENIX_API_KEY: ${{ secrets.PHOENIX_API_KEY }}#+
+      # Add any other secrets you need#+
+    steps:
+      - uses: actions/checkout@v2#-
+      - name: Use Node.js#-
+        uses: actions/setup-node@v1#-
+        with:#-
+          node-version: '16.x'#-
+      - run: npm ci#-
+      - run: npm run build#-
+      - run: npm test#-
+    - uses: actions/checkout@v2#+
+#+
+    - name: Set up Python#+
+      uses: actions/setup-python@v2#+
+      with:#+
+        python-version: '3.9'#+
+#+
+    - name: Install dependencies#+
+      run: |#+
+        python -m pip install --upgrade pip#+
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi#+
+#+
+    - name: Run tests#+
+      run: |#+
+        # Add your test commands here#+
+        python -m pytest#+
+>>>>>>> Tabnine >>>>>>># {"source":"chat"}

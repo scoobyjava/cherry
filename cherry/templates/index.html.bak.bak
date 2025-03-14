@@ -1,0 +1,98 @@
+<<<<<<< Tabnine <<<<<<<
+<!DOCTYPE html>
+<html lang="en">
+  <head>//-
+    <meta charset="UTF-8" />//-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />//-
+    <title>Cherry - AI Orchestration Platform</title>//-
+    <link//-
+      rel="stylesheet"//-
+      href="{{ url_for('static', filename='css/main.css') }}"//-
+    />//-
+  </head>//-
+  <body>//-
+    <header>//-
+      <h1>Cherry</h1>//-
+      <nav>//-
+        <ul>//-
+          <li><a href="/">Home</a></li>//-
+          <li><a href="/dashboard">Dashboard</a></li>//-
+        </ul>//-
+      </nav>//-
+    </header>//-
+<head>//+
+    <meta charset="UTF-8">//+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">//+
+    <title>Cherry - Multi-Agent System</title>//+
+    <style>//+
+        body {//+
+            font-family: Arial, sans-serif;//+
+            line-height: 1.6;//+
+            margin: 0;//+
+            padding: 20px;//+
+            color: #333;//+
+        }//+
+        header {//+
+            background-color: #f4f4f4;//+
+            padding: 20px;//+
+            margin-bottom: 20px;//+
+            border-radius: 5px;//+
+        }//+
+        h1 {//+
+            color: #e91e63;//+
+        }//+
+        .container {//+
+            max-width: 1200px;//+
+            margin: 0 auto;//+
+        }//+
+        .card {//+
+            border: 1px solid #ddd;//+
+            border-radius: 5px;//+
+            padding: 20px;//+
+            margin-bottom: 20px;//+
+            background-color: #fff;//+
+        }//+
+        .nav {//+
+            display: flex;//+
+            list-style: none;//+
+            padding: 0;//+
+        }//+
+        .nav li {//+
+            margin-right: 15px;//+
+        }//+
+        .nav a {//+
+            text-decoration: none;//+
+            color: #e91e63;//+
+            font-weight: bold;//+
+        }//+
+    </style>//+
+</head>//+
+<body>//+
+    <div class="container">//+
+        <header>//+
+            <h1>Cherry Multi-Agent System</h1>//+
+            <ul class="nav">//+
+                <li><a href="/">Home</a></li>//+
+                <li><a href="/dashboard">Dashboard</a></li>//+
+                <li><a href="/visualization/agent-network">Agent Network</a></li>//+
+                <li><a href="/status">System Status</a></li>//+
+            </ul>//+
+        </header>//+
+
+    <main>//-
+      <section class="hero">//-
+        <h2>Welcome to Cherry</h2>//-
+        <p>An intelligent AI orchestration platform</p>//-
+        <a href="/dashboard" class="cta-button">View Dashboard</a>//-
+      </section>//-
+    </main>//-
+//-
+    <footer>//-
+      <p>&copy; 2025 Cherry AI</p>//-
+    </footer>//-
+  </body>//-
+</html>//-
+        <div class="card">//+
+            <h2>Welcome to Cherry</h2>//+
+            <p>Cherry is an advanced multi-agent system designed to coordinate various AI agents to accomplish//+
+>>>>>>> Tabnine >>>>>>>// {"source":"chat"}

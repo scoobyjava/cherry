@@ -32,7 +32,7 @@ Set up the following secrets in your GitHub organization:
 Organizational secrets are automatically available as environment variables in GitHub Actions workflows for repositories that have access to them:
 
 ```yaml
-<<<<<<< Tabnine <<<<<<<
+
 # No//-
 ```//-
 import os//+
