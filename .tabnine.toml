@@ -1,0 +1,14 @@
+[tabnine]
+# Prevent leaving conflict markers in files
+clean_conflicts = true
+
+# Ensure suggestions are properly formatted
+format_on_apply = true
+
+# Limit the scope of auto-apply to reduce conflicts
+auto_apply_scope = "line"  # Only apply suggestions for the current line
+
+# Disable auto-apply for certain file types that might be problematic
+[tabnine.file_types]
+markdown = { auto_apply = false }
+json = { auto_apply = false }
