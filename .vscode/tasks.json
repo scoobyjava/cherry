@@ -1,0 +1,68 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Azure Auto Login",
+      "type": "shell",
+      "command": "if [ -f \"${workspaceFolder}/scripts/azure_login.sh\" ]; then ${workspaceFolder}/scripts/azure_login.sh; else echo 'Login script not found. Creating it...'; mkdir -p ${workspaceFolder}/scripts && echo '#!/bin/bash\\naz login --use-device-code' > ${workspaceFolder}/scripts/azure_login.sh && chmod +x ${workspaceFolder}/scripts/azure_login.sh && ${workspaceFolder}/scripts/azure_login.sh; fi",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      }
+    },
+    {
+      "label": "List Azure Extensions",
+      "type": "shell",
+      "command": "az extension list --output table",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Install Azure DevOps Extension",
+      "type": "shell",
+      "command": "az extension add --name azure-devops --only-show-errors || echo 'Azure DevOps extension already installed'",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Install Azure Container Apps Extension",
+      "type": "shell",
+      "command": "az extension add --name containerapp --only-show-errors || echo 'Container App extension already installed'",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Show Azure Account Info",
+      "type": "shell",
+      "command": "az account show --output table",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "List Azure Resource Groups",
+      "type": "shell",
+      "command": "az group list --output table",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    }
+  ]
+}

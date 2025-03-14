@@ -1,0 +1,142 @@
+{
+  "auditReportVersion": 2,
+  "vulnerabilities": {
+    "@babel/helpers": {
+      "name": "@babel/helpers",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1103026,
+          "name": "@babel/helpers",
+          "dependency": "@babel/helpers",
+          "title": "Babel has inefficient RexExp complexity in generated code with .replace when transpiling named capturing groups",
+          "url": "https://github.com/advisories/GHSA-968p-4wvh-cqc8",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-1333"
+          ],
+          "cvss": {
+            "score": 6.2,
+            "vectorString": "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<7.26.10"
+        }
+      ],
+      "effects": [],
+      "range": "<7.26.10",
+      "nodes": [
+        "node_modules/@babel/helpers"
+      ],
+      "fixAvailable": true
+    },
+    "@babel/runtime": {
+      "name": "@babel/runtime",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1103025,
+          "name": "@babel/runtime",
+          "dependency": "@babel/runtime",
+          "title": "Babel has inefficient RexExp complexity in generated code with .replace when transpiling named capturing groups",
+          "url": "https://github.com/advisories/GHSA-968p-4wvh-cqc8",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-1333"
+          ],
+          "cvss": {
+            "score": 6.2,
+            "vectorString": "CVSS:3.1/AV:L/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<7.26.10"
+        }
+      ],
+      "effects": [],
+      "range": "<7.26.10",
+      "nodes": [
+        "node_modules/@babel/runtime"
+      ],
+      "fixAvailable": true
+    },
+    "child-process-promise": {
+      "name": "child-process-promise",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "cross-spawn"
+      ],
+      "effects": [
+        "detox"
+      ],
+      "range": ">=2.2.0",
+      "nodes": [
+        "node_modules/child-process-promise"
+      ],
+      "fixAvailable": true
+    },
+    "cross-spawn": {
+      "name": "cross-spawn",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1100562,
+          "name": "cross-spawn",
+          "dependency": "cross-spawn",
+          "title": "Regular Expression Denial of Service (ReDoS) in cross-spawn",
+          "url": "https://github.com/advisories/GHSA-3xgq-45jj-v275",
+          "severity": "high",
+          "cwe": [
+            "CWE-1333"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<6.0.6"
+        }
+      ],
+      "effects": [
+        "child-process-promise"
+      ],
+      "range": "<6.0.6",
+      "nodes": [
+        "node_modules/child-process-promise/node_modules/cross-spawn"
+      ],
+      "fixAvailable": true
+    },
+    "detox": {
+      "name": "detox",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "child-process-promise"
+      ],
+      "effects": [],
+      "range": "4.1.1 - 20.34.4 || >=21.0.0-breaking.new-global-lifecycle.0",
+      "nodes": [
+        "node_modules/detox"
+      ],
+      "fixAvailable": true
+    }
+  },
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 2,
+      "high": 3,
+      "critical": 0,
+      "total": 5
+    },
+    "dependencies": {
+      "prod": 159,
+      "dev": 680,
+      "optional": 12,
+      "peer": 159,
+      "peerOptional": 0,
+      "total": 839
+    }
+  }
+}
