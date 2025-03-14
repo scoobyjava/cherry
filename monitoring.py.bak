@@ -1,3 +1,4 @@
+<<<<<<< Tabnine <<<<<<<
 # monitoring.py
 from phoenix.trace import Span, capture_span
 from litellm import completion
@@ -5,7 +6,8 @@ import functools
 import os
 import time
 
-# Configure Phoenix using environment variables (populated from GitHub secrets)
+# Configure Phoenix#-
+# Configure Phoenix using environment variables (populated from GitHub secrets)#+
 PHOENIX_API_KEY = os.environ.get("PHOENIX_API_KEY")
 PHOENIX_ENDPOINT = os.environ.get(
     "PHOENIX_ENDPOINT", "https://phoenix.berri.ai")
@@ -61,10 +63,13 @@ def phoenix_trace(func):
 
     return wrapper
 
+# Wrap LiteLLM completion function#-
 
+#-
 @phoenix_trace
 async def monitored_completion(*args, **kwargs):
     """
     Wrapped version of litellm.completion with Phoenix monitoring
     """
     return await completion(*args, **kwargs)
+>>>>>>> Tabnine >>>>>>># {"source":"chat"}

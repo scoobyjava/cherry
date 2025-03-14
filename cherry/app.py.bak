@@ -1,21 +1,34 @@
-from flask import Flask
-from cherry.routes.visualization_routes import visualization_bp
-from cherry.routes.status_routes import status_bp
-# Import other blueprints
+<<<<<<< Tabnine <<<<<<<
+from flask import Flask, render_template, jsonify#-
+from dotenv import load_dotenv#-
+import os#-
+import random#-
+from flask import Flask#+
+from cherry.routes.visualization_routes import visualization_bp#+
+from cherry.routes.status_routes import status_bp#+
+# Import other blueprints#+
 
+# Load environment variables from .env file#-
+load_dotenv()#-
 def create_app():
     app = Flask(__name__)
 
     # Register blueprints
-    app.register_blueprint(visualization_bp, url_prefix='/visualization')
-    app.register_blueprint(status_bp, url_prefix='/status')
-    # Register other blueprints
-
-    return app
-
-if __name__ == "__main__":
-    app = create_app()
-    app.run(debug=True)
+    try:#-
+        from .api.visualization_routes import visualization_bp#-
+        app.register_blueprint(visualization_bp)#-
+    except ImportError:#-
+        print("Warning: Could not import visualization_routes, skipping blueprint registration")#-
+    app.register_blueprint(visualization_bp, url_prefix='/visualization')#+
+    app.register_blueprint(status_bp, url_prefix='/status')#+
+    # Register other blueprints#+
+#+
+    return app#+
+#+
+if __name__ == "__main__":#+
+    app = create_app()#+
+    app.run(debug=True)#+
+>>>>>>> Tabnine >>>>>>># {"source":"chat"}
 
     # Ensure static directories exist
     os.makedirs(os.path.join(app.static_folder, 'reports'), exist_ok=True)
