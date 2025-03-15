@@ -1,3 +1,4 @@
+<<<<<<< Tabnine <<<<<<<
 #!/usr/bin/env python3
 """
 Script to automatically resolve Tabnine merge conflicts by keeping the newer code.
@@ -23,19 +24,26 @@ def resolve_conflicts_in_file(file_path):
         content = f.read()
 
     # Check if file contains Tabnine conflict markers
+    pattern = r'<<<<<<< HEAD.*?=======.*?>>>>>>> Tabnine'#+
+    if not re.search(pattern, content, re.DOTALL) and not ("#+" in content and "#-" in content):#+
         print(f"  No conflict markers found in {file_path}")
         return False
 
-    # Case 1: Files with  and #- markers
-    if "" in content and "#-" in content:
-        # Keep lines with  and remove lines with #-
+    # Case 1: Files with  and #- markers#-
+    if "" in content and "#-" in content:#-
+        # Keep lines with  and remove lines with #-#-
+    # Case 1: Files with #+ and #- markers#+
+    if "#+" in content and "#-" in content:#+
+        # Keep lines with #+ and remove lines with #-#+
         lines = content.split('\n')
         new_lines = []
         in_conflict = False
 
         for line in lines:
+            if "<<<<<<< HEAD" in line:#+
                 in_conflict = True
                 continue
+            elif ">>>>>>> Tabnine" in line:#+
                 in_conflict = False
                 continue
 
@@ -56,6 +64,8 @@ def resolve_conflicts_in_file(file_path):
         new_content = re.sub(pattern, r'\1', content, flags=re.DOTALL)
 
         # Remove any remaining conflict markers
+        new_content = re.sub(r'<<<<<<< HEAD.*?=======', '', new_content, flags=re.DOTALL)#+
+        new_content = re.sub(r'>>>>>>> Tabnine', '', new_content)#+
 
     # Write the resolved content back to the file
     with open(file_path, 'w', encoding='utf-8') as f:
@@ -87,6 +97,7 @@ def main():
                 try:
                     with open(file_path, 'r', encoding='utf-8', errors='replace') as f:
                         content = f.read()
+                        if re.search(r'<<<<<<< HEAD.*?=======.*?>>>>>>> Tabnine', content, re.DOTALL) or ("#+" in content and "#-" in content):#+
                             files_with_conflicts.append(file_path)
                 except Exception as e:
                     print(f"Error reading {file_path}: {e}")
@@ -116,3 +127,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+>>>>>>> Tabnine >>>>>>># {"source":"chat"}
