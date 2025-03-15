@@ -1,6 +1,12 @@
+<<<<<<< Tabnine <<<<<<<
 # Use the official slim Python 3.9 image
 FROM node:20-alpine
 
+# Install Azure CLI dependencies and the CLI itself#+
+RUN apk add --no-cache bash py3-pip curl && \#+
+    apk add --no-cache --virtual .build-deps gcc musl-dev python3-dev libffi-dev openssl-dev cargo make && \#+
+    pip3 install --no-cache-dir azure-cli && \#+
+    apk del .build-deps#+
 # Set the working directory in the container
 WORKDIR /app
 
@@ -18,6 +24,7 @@ EXPOSE 3001
 
 # Specify the command to run the application
 CMD ["node", "src/api/githubWebhook.js"]
+>>>>>>> Tabnine >>>>>>># {"source":"chat"}
 # Example task update snippet
 class TaskManager:
 def __init__(self):
