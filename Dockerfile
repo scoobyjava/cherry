@@ -1,6 +1,6 @@
 <<<<<<< Tabnine <<<<<<<
 # Use the official slim Python 3.9 image
-FROM node:20-alpine
+FROM node:23-alpine
 
 # Install Azure CLI dependencies and the CLI itself#+
 RUN apk add --no-cache bash py3-pip curl && \#+
